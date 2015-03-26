@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no" />
+	<meta name="theme-color" content="#242d33">
+
+	<!-- Some Gaia components -->
+	<link href="css/gaia/headers.css" rel="stylesheet" />
+	<link href="css/gaia/lists.css" rel="stylesheet" />
+	<link href="css/gaia/layout.css" rel="stylesheet" />
+	<link href="css/gaia/scrolling.css" rel="stylesheet" />
+	<link href="css/gaia/status.css" rel="stylesheet" />
+	<link href="css/gaia/edit_mode.css" rel="stylesheet" />
+	<link href="css/gaia/buttons.css" rel="stylesheet" />
+	<link href="css/gaia/action_menu.css" rel="stylesheet" />
+	<link href="css/gaia/input_areas.css" rel="stylesheet" />
+	<link href="css/gaia/value_selectors.css" rel="stylesheet" />
+	
+	<!-- Some others stylish stuff -->
+	<link href="css/style.css" rel="stylesheet" />
+	<link href="css/util.css" rel="stylesheet" />
+	<link href="css/transitions.css" rel="stylesheet" />
+	
+	<!-- Using gaia-icons/gaia-icons.css instead of gaia/icons.css -->
+	<link href="css/gaia-icons/gaia-icons.css" rel="stylesheet" />
+	
+	<!-- Script -->
+	<script src="js/jquery-2.1.1.min.js"></script>
+	<script src="js/openpgp.min.js"></script>
+	<script src="js/openpgp.worker.min.js"></script>
+	<script src="js/status.js"></script>
+	<script src="js/storage.js"></script>
+	<script src="js/app.js"></script>
+	
+</head>
+<body role='application'>
+	<section role='region' id='home' data-position="current" class='skin-dark'>
+		<header class='fixed'>
+			<h1>OpenPGP</h1>
+		</header>
+		<article class="content scrollable header">
+			<section data-type="list">
+				<ul>
+					<li><a href="#" id="generate-pair"><p>Generate a pair</p></a></li>
+					<li><a href="#" id="load-pub-key"><p>Load a Public key</p></a></li>
+					<li><a href="#" id="load-priv-key"><p>Load a Private key</p></a></li>
+					<li><a href="#" id="encrypt"><p>Encrypt a message</p></a></li>
+					<li><a href="#" id="decrypt"><p>Decrypt a message</p></a></li>
+				</ul>
+			</section>
+		</article>
+	</section>
+	<section role="region" id="right" data-position="right" class="skin-dark">
+		<header class="fixed">
+			<button id="back" data-icon="back"></button>
+			<h1 id="head"></h1>
+		</header>
+		<article class="content scrollable header" id="wrapper">
+			<!-- ... -->
+		</article>
+	</section>
+</body>
+</html>
+
+
+
+
+
+

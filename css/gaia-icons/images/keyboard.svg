@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   width="30"
+   height="30"
+   viewBox="0 0 30 30"
+   id="svg2">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8" />
+  <path
+     d="M 24.488,6.54 H 4.5 c -1.11,0 -2.007,0.903 -1.997,1.872 v 11.94 C 2.493,21.6 3.39,22.5 4.5,22.5 h 19.988 c 1.107,0 2.012,-0.898 2.012,-2.008 V 8.552 C 26.5,7.442 25.598,6.54 24.488,6.54 z m -5.02,2.908 h 2.05 l 0.002,2.095 h -2.062 l 0.01,-2.095 z m 2.048,4.02 -0.01,2.062 H 19.5 v -2.062 h 2.016 z M 16.5,9.448 h 2.03 l -0.01,2.095 h -2.05 l 0.028,-2.095 z m 2.03,4.02 V 15.53 H 16.5 v -2.062 h 2.03 z m -5.046,-4.02 h 2.047 l -0.028,2.095 h -2.046 l 0.028,-2.095 z m 2.02,4.05 V 15.53 L 13.497,15.5 13.5,13.47 15.504,13.5 z M 10.5,9.45 h 2.016 l -0.012,2.095 h -2.03 L 10.5,9.45 z m -0.016,4.02 h 2.02 l 0.012,2.062 h -2.03 L 10.484,13.47 z M 9.531,9.45 9.521,11.545 H 7.487 L 7.483,9.45 H 9.53 z m 0,4.02 v 2.062 H 7.48 L 7.47,13.47 H 9.53 z M 4.454,9.45 H 6.516 L 6.504,11.545 H 4.44 L 4.453,9.45 z m 0,4.02 H 6.53 v 2.062 H 4.454 V 13.47 z M 8.5,19.5 4.474,19.556 4.469,17.469 l 4.033,0.03 -0.003,2 z M 9.496,19.556 9.5,17.47 19.504,17.5 19.512,19.556 H 9.496 z M 24.5,19.54 l -4.004,0.016 -0.012,-2.087 4.02,0.03 -0.004,2.04 z M 24.504,15.53 22.5,15.5 v -2.032 l 2.004,0.03 v 2.032 z m -2.047,-3.987 0.035,-2.096 h 2.014 l -0.002,2.096 h -2.047 z"
+     inkscape:connector-curvature="0"
+     id="path4" />
+</svg>

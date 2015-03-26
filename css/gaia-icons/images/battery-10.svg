@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.0.1 (7597) - http://www.bohemiancoding.com/sketch -->
+    <title>Artboard 1</title>
+    <description>Created with Sketch.</description>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Artboard-1" sketch:type="MSArtboardGroup" fill="#000000">
+            <g id="battery-10" sketch:type="MSLayerGroup" transform="translate(3.000000, 10.000000)">
+                <path d="M23.7603053,2.5000828 L21.8403206,2.5000828 C21.600288,1.1667078 21.2003146,0.1667318 20.7203117,1.77635684e-15 L1.44001104,1.77635684e-15 C0.640004928,1.77635684e-15 0,2.2500168 0,5.0000378 C0,7.7500598 0.63975984,10.0001398 1.43976586,10.0001398 L20.8001587,10.0001398 C21.2800714,9.8335358 21.680135,8.8335918 21.9200458,7.5001208 L23.8400602,7.5001208 C24,6.7500838 24,5.9169668 24,5.0001008 C24,4.0832368 23.920032,3.2501198 23.759784,2.5000828 L23.7603053,2.5000828 Z" id="path4" sketch:type="MSShapeGroup"></path>
+            </g>
+        </g>
+    </g>
+</svg>

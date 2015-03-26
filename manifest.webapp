@@ -1,0 +1,28 @@
+{
+	"name": "OpenPGP",
+	"description": "Send encrypted messages through PGP!",
+	"developer": {
+		"name": "aroblu94",
+		"url": "http://aro94.altervista.org"
+	},
+	"default_locale": "it",
+	"version": "0.1",
+	"icons": {
+		"16": "/icons/16x16.png",
+		"32": "/icons/32x32.png",
+		"48": "/icons/48x48.png",
+		"60": "/icons/60x60.png",
+		"64": "/icons/64x64.png",
+		"90": "/icons/90x90.png",
+		"120": "/icons/120x120.png",
+		"128": "/icons/128x128.png",
+		"256": "/icons/256x256.png"
+	},
+	"type": "privileged",
+    "permissions": {
+        "systemXHR": {
+            "description": "Used to retrive news from websites"
+        }
+    },
+	"launch_path": "/index.html"
+}
