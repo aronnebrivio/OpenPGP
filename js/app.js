@@ -9,7 +9,7 @@ my_public_key = "";
 $(document).ready(function() {
 	var db = new DB();
 
-	console.log("I'm alive!");
+	console.log(db.get());
 
 	$(document).on("click", "#btn-generate", function() {
 		name = $('input[name=name]').val();
@@ -40,22 +40,46 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#btn-encrypt", function() {
+		bob = $('input[name=bob]').val();
+		console.log(bob);
+		bob_pub_armored = db.getPub(bob);
+		console.log(bob_pub_armored);
 		msg = $('textarea[name=msg]').val();
-		my_pub = openpgp.key.readArmored(my_public_key);
-		emsg = openpgp.encryptMessage(my_pub.keys, msg)
-			.then(function() {
-				console.log("Encrypted message: \n" + emsg + "\n");
-				console.log("Encrypted message: \n" + emsg.text() + "\n");
+		bob_pub = openpgp.key.readArmored(bob_pub_armored);
+		openpgp.encryptMessage(bob_pub.keys, msg)
+			.then(function(r) {
+				console.log(r);
+				emsg = r;
+			})
+			.catch(function(err) {
+				console.log("Encrypting error");
 			});
 	});
 	
 	$(document).on("click", "#btn-decrypt", function() {
+		alice = $('input[name=alice]').val();
+		console.log(alice);
 		emsg = $('textarea[name=emsg]').val();
+		console.log(emsg);
 		pwd = $('input[name=pwd]').val();
-		openpgp_emsg = openpgp.message.readArmored(emsg);
-		my_key.key.decrypt(pwd);
-		msg = openpgp.decryptMessage(my_key.key, emsg);
-		console.log("Decrypted message: \n" + msg + "\n");
+		alice_priv_armored = db.getPriv(alice);
+		alice_priv = openpgp.key.readArmored(alice_priv_armored).keys[0];
+		alice_priv.decrypt(pwd);
+		emsg = openpgp.message.readArmored(emsg);
+		openpgp.decryptMessage(alice_priv, emsg)
+			.then(function(r) {
+				console.log(r);
+				msg = r;
+			})
+			.catch(function(err) {
+				console.log("Decrypting error");
+			});
+	});
+	
+	$(document).on("click", "#empty", function() {
+		db.clearDB();
+		console.log(localStorage.length);
+		utils.status.show("Database empty");
 	});
 	
 	/* Navigation */
@@ -87,7 +111,8 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#encrypt", function() {
-		wrap = "<div><textarea type='text' name='msg' placeholder='Write your message to encrypt here' />" +
+		wrap = "<div><input type='text' name='bob' placeholder='Email of the receiver' />" +
+				"<textarea type='text' name='msg' placeholder='Write your message to encrypt here' />" +
 				"<button id='btn-encrypt'>Encrypt Message</button></div>";
 		document.querySelector('#right').className = 'skin-dark current';
 		document.querySelector('[data-position="current"]').className = 'skin-dark left';
@@ -96,9 +121,10 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#decrypt", function() {
-		wrap = "<div><textarea type='text' name='emsg' placeholder='Paste encrypted text here' />" +
+		wrap = "<div><input type='text' name='alice' placeholder='Your Email' />" +
+				"<textarea type='text' name='emsg' placeholder='Paste encrypted text here' />" +
 				"<input type='password' name='pwd' placeholder='Password' />" +
-				"<button id='btn-encrypt'>Decrypt Message</button></div>";
+				"<button id='btn-decrypt'>Decrypt Message</button></div>";
 		document.querySelector('#right').className = 'skin-dark current';
 		document.querySelector('[data-position="current"]').className = 'skin-dark left';
 		$("#wrapper").append(wrap);
