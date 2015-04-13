@@ -4,8 +4,7 @@
 function DB() {
 	var db = init();
 	
-
-	/* obj = { name:name, email:email, pub:pub_key, priv:priv_key, pwd:password} */
+	/* obj = { name:name, email:email, pub:pub_key, priv:priv_key} */
 	this.save = function(objs) {
 		temp = arDifference(objs,db);
 		db = temp.concat(db);
@@ -28,14 +27,6 @@ function DB() {
 		for(var i = 0; i < db.length;i++) {
 			if(db[i].email == email) {
 				return db[i].pub;
-			}
-		}
-	};
-	
-	this.getPwd = function(email) {
-		for(var i = 0; i < db.length;i++) {
-			if(db[i].email == email) {
-				return db[i].pwd;
 			}
 		}
 	};
