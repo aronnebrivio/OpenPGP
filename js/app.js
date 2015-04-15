@@ -71,7 +71,29 @@ $(document).ready(function() {
 				alert("Decrypting error");
 			});
 	});
-	
+
+	$(document).on("click", "#search_pub", function() {
+		email = $('input[name=bob]').val();
+		xhr = new XMLHttpRequest({mozSystem: true});
+		url = "https://pgp.mit.edu/pks/lookup?search=" + email;
+		console.log(url);
+		xhr.open("GET", url, true);
+		console.log("ok");
+		xhr.timeout = 5750;
+		xhr.addEventListener('timeout', function() {
+			alert("Nessuna risposta dal server. Controllare la connessione e toccare l'icona Ricarica.");
+		});	
+		console.log("ok");
+		xhr.onload = function() {
+			console.log("ok");
+        	if(xhr.status === 200) {
+        		console.log("ok");
+        		page = xhr.responseXML;
+        		console.log(page);
+        	}
+		}
+	});
+		
 	$(document).on("click", "#empty", function() {
 		db.clearDB();
 		console.log(localStorage.length);
@@ -98,17 +120,18 @@ $(document).ready(function() {
 				"<input type='email' name='email' placeholder='Your Email' />" +
 				"<input type='password' name='pwd' placeholder='Passphrase' />" +
 				"<button id='btn-generate'>Generate Pair</button></div>";
-		document.querySelector('#right').className = 'skin-dark current';
-		document.querySelector('[data-position="current"]').className = 'skin-organic left';
+		document.querySelector('#right').className = 'current';
+		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Generate Pair");
 		$("#tbar").append("<button disabled></button>");
 	});
 	
 	$(document).on("click", "#load-pub-key", function() {
-		wrap = "<div><p>Not implemented</p></div>";
-		document.querySelector('#right').className = 'skin-organic current';
-		document.querySelector('[data-position="current"]').className = 'skin-organic left';
+		wrap = "<div><input type='text' name='bob' placeholder='Type an email' />" +
+				"<button id='search_pub'>Search</button></div>";
+		document.querySelector('#right').className = 'current';
+		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Load Public Key");
 		$("#tbar").append("<button disabled></button>");
@@ -116,8 +139,8 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#load-priv-key", function() {
 		wrap = "<div><p>Not implemented</p></div>";
-		document.querySelector('#right').className = 'skin-organic current';
-		document.querySelector('[data-position="current"]').className = 'skin-organic left';
+		document.querySelector('#right').className = 'current';
+		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Load Private Key");
 		$("#tbar").append("<button disabled></button>");
@@ -128,8 +151,8 @@ $(document).ready(function() {
 				"<textarea type='text' name='msg' placeholder='Write your message to encrypt here' />" +
 				"<button id='btn-encrypt'>Encrypt Message</button>" +
 				"<textarea type='text' name='emsg' placeholder='Encrypted text will be here' /></div>";
-		document.querySelector('#right').className = 'skin-organic current';
-		document.querySelector('[data-position="current"]').className = 'skin-organic left';
+		document.querySelector('#right').className = 'current';
+		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Encrypt");
 		$("#tbar").append("<button id='send-e' data-icon='email'></button>");
@@ -141,16 +164,45 @@ $(document).ready(function() {
 				"<input type='password' name='pwd' placeholder='Passphrase' />" +
 				"<button id='btn-decrypt'>Decrypt Message</button>" +
 				"<textarea type='text' name='msg' placeholder='Decrypted text will be here' /></div>";
-		document.querySelector('#right').className = 'skin-organic current';
-		document.querySelector('[data-position="current"]').className = 'skin-organic left';
+		document.querySelector('#right').className = 'current';
+		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Decrypt");
 		$("#tbar").append("<button disabled></button>");
 	});
 	
+	$(document).on("click", "#database", function() {
+		items = "";
+		if(db.get().length != 0) {
+			for(i = 0; i < db.get().length; i++) {
+				console.log(i);
+				name = db.get()[i].name;
+				email = db.get()[i].email;
+				if(db.get()[i].priv != "")
+					priv = "priv - ";
+				else
+					priv = "";
+				pub = "pub";
+				item = "<li><a href='#' id='" + email + "'><p>" + name + " - " + email + "</p>" +
+						"<p>" + priv + pub + "</p></a></li>";
+				console.log(item);
+				items = items + item;
+			}
+			wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
+					"<div><button id='empty'>Clear database</button><div>";
+		}
+		else
+			wrap = "<div><p>Database empty</p></div>";
+		document.querySelector('#right').className = 'current';
+		document.querySelector('[data-position="current"]').className = 'left';
+		$("#wrapper").append(wrap);
+		$("#head").append("Database");
+		$("#tbar").append("<button disabled></button>");
+	});
+	
 	$(document).on("click", "#back", function() {
-		$("[data-position='current']").attr('class', 'skin-organic current');
-		$("[data-position='right']").attr('class', 'skin-organic right');
+		$("[data-position='current']").attr('class', 'current');
+		$("[data-position='right']").attr('class', 'right');
 		$("#wrapper").empty();
 		$("#head").empty();
 		$("#tbar").empty();
