@@ -20,6 +20,17 @@
 	z-index: 15;
 	z-index: 100; /* -> drawer */
 }
+[data-position="down"] {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	transform: translateY(100%);
+	-webkit-transform: translateY(100%);
+	z-index: 15;
+	z-index: 100; /* -> drawer */
+}
 section[role="region"][data-position="right"] {
 	position: absolute;
 }
@@ -38,4 +49,16 @@ section[role="region"][data-position="right"] {
 [data-position="current"].current {
 	animation: leftToCurrent 0.4s forwards;
 	-webkit-animation: leftToCurrent 0.4s forwards;
+}
+[data-position="down"].current {
+	animation: downToCurrent 0.4s forwards;
+	-webkit-animation: downToCurrent 0.4s forwards;
+}
+[data-position="current"].down {
+	animation: currentToDown 0.4s forwards;
+	-webkit-animation: currentToDown 0.4s forwards;
+}
+[data-position="down"].down {
+	animation: downToDown 0.4s forwards;
+	-webkit-animation: downToDown 0.4s forwards;
 }

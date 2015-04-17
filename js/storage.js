@@ -15,6 +15,14 @@ function DB() {
 		return db;
 	};
 
+	this.getName = function(email) {
+		for(var i = 0; i < db.length; i++) {
+			if(db[i].email == email) {
+				return db[i].name;
+			}
+		}
+	}
+
 	this.getPriv = function(email) {
 		for(var i = 0; i < db.length;i++) {
 			if(db[i].email == email) {
@@ -29,6 +37,15 @@ function DB() {
 				return db[i].pub;
 			}
 		}
+	};
+	
+	this.modName = function(email, name) {
+		for(var i = 0; i < db.length;i++) {
+			if(db[i].email == email) {
+				db[i].name = name;
+				localStorage.setItem('mydb', JSON.stringify(db));
+			}
+		}	
 	};
 	
 	/* DEBUG ONLY */

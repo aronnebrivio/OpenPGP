@@ -41,17 +41,26 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#btn-encrypt", function() {
 		bob = $('input[name=bob]').val();
-		bob_pub_armored = db.getPub(bob);
-		msg = $('textarea[name=msg]').val();
-		bob_pub = openpgp.key.readArmored(bob_pub_armored);
-		openpgp.encryptMessage(bob_pub.keys, msg)
-			.then(function(r) {
-				emsg = r;
-				$('textarea[name=emsg]').val(emsg);
-			})
-			.catch(function(err) {
-				alert("Encrypting error");
-			});
+		var bool = false;
+		for(i = 0; i < db.get().length; i++) {
+			if(db.get()[i].email === bob)
+				bool = true;
+		}
+		if(bool) {
+			bob_pub_armored = db.getPub(bob);
+			msg = $('textarea[name=msg]').val();
+			bob_pub = openpgp.key.readArmored(bob_pub_armored);
+			openpgp.encryptMessage(bob_pub.keys, msg)
+				.then(function(r) {
+					emsg = r;
+					$('textarea[name=emsg]').val(emsg);
+				})
+				.catch(function(err) {
+					alert("Encrypting error");
+				});
+		}
+		else
+			alert("Email not present in the local database");
 	});
 	
 	$(document).on("click", "#btn-decrypt", function() {
@@ -74,24 +83,47 @@ $(document).ready(function() {
 
 	$(document).on("click", "#search_pub", function() {
 		email = $('input[name=bob]').val();
+		emailURI = encodeURIComponent(email);
 		xhr = new XMLHttpRequest({mozSystem: true});
-		url = "https://pgp.mit.edu/pks/lookup?search=" + email;
+		url = "https://pgp.mit.edu/pks/lookup?search=" + emailURI + "&op=get";
 		console.log(url);
 		xhr.open("GET", url, true);
-		console.log("ok");
-		xhr.timeout = 5750;
+		
+		xhr.timeout = 100000;
 		xhr.addEventListener('timeout', function() {
 			alert("Nessuna risposta dal server. Controllare la connessione e toccare l'icona Ricarica.");
-		});	
-		console.log("ok");
+		});
 		xhr.onload = function() {
-			console.log("ok");
-        	if(xhr.status === 200) {
-        		console.log("ok");
-        		page = xhr.responseXML;
-        		console.log(page);
-        	}
+			if(xhr.status == 200) {
+		    	page = $(xhr.response);
+		    	pub_to_import = $(xhr.response)[9].innerHTML;
+		    	console.log(pub_to_import);
+		    	wrap = "<div data-type='list'><header>Results</header>" +
+		    			"<ul><li><a href='#' id='a'><p>" + email + "</p>" +
+		    			"<p>Tap here to save his public key</p></a></li></ul>";
+		    	$("#wrapper").append(wrap);
+			}
+			else if(xhr.status == 404) {
+				alert("No results found");
+			}
 		}
+		xhr.send();
+		$(document).on("click", "#a", function() {
+			var arr = new Array();
+			data = {
+				'name':'undefined',
+				'email':email,
+				'pub':pub_to_import,
+				'priv':''
+			};
+			arr.push(data);
+			db.save(arr);
+			utils.status.show("Pub key saved");
+		});
+	});
+	
+	$(document).on("click", "#pick_pub", function() {
+		alert("Not implemented yet.");
 	});
 		
 	$(document).on("click", "#empty", function() {
@@ -114,6 +146,15 @@ $(document).ready(function() {
 		});
 	});
 	
+	$(document).on("click", "#update", function() {
+		name = $('input[name=name]').val();
+		email = $("#head_down").text();
+		console.log(name);
+		console.log(email);
+		db.modName(email, name);
+		utils.status.show("Name modified");
+	});
+	
 	/* Navigation */
 	$(document).on("click", "#generate-pair", function() {
 		wrap = "<div><input type='text' name='name' placeholder='Your Name' />" +
@@ -129,7 +170,8 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#load-pub-key", function() {
 		wrap = "<div><input type='text' name='bob' placeholder='Type an email' />" +
-				"<button id='search_pub'>Search</button></div>";
+				"<button id='search_pub'>Search</button>" +
+				"<button id='pick_pub'>Pick Pub key from file</button></div>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
@@ -183,13 +225,13 @@ $(document).ready(function() {
 				else
 					priv = "";
 				pub = "pub";
-				item = "<li><a href='#' id='" + email + "'><p>" + name + " - " + email + "</p>" +
+				item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
 						"<p>" + priv + pub + "</p></a></li>";
 				console.log(item);
 				items = items + item;
 			}
 			wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
-					"<div><button id='empty'>Clear database</button><div>";
+					"<div><button id='empty' class='danger'>Clear database</button><div>";
 		}
 		else
 			wrap = "<div><p>Database empty</p></div>";
@@ -198,6 +240,44 @@ $(document).ready(function() {
 		$("#wrapper").append(wrap);
 		$("#head").append("Database");
 		$("#tbar").append("<button disabled></button>");
+	});
+	
+	$(document).on("click", ".keys", function() {
+		name = db.getName(this.id);
+		console.log(name);
+		wrap = "<div><input type='text' name='name' placeholder='" + name + "' />" +
+				"<button id='update'>Update</button>" +
+				"<button id='remove' class='danger'>Remove key</button></div>";
+		$("#wrapper_down").append(wrap);
+		$("#head_down").append(this.id);
+		document.querySelector('#down').className = 'current';
+	});
+	
+	$(document).on("click", "#close", function() {
+		$("#wrapper").empty();
+		$("#head").empty();
+		$("#tbar").empty();
+		items = "";
+		for(i = 0; i < db.get().length; i++) {
+			name = db.get()[i].name;
+			email = db.get()[i].email;
+			if(db.get()[i].priv != "")
+				priv = "priv - ";
+			else
+				priv = "";
+			pub = "pub";
+			item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
+					"<p>" + priv + pub + "</p></a></li>";
+			items = items + item;
+		}
+		wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
+				"<div><button id='empty' class='danger'>Clear database</button><div>";
+		$("#wrapper").append(wrap);
+		$("#head").append("Database");
+		$("#tbar").append("<button disabled></button>");
+		$("[data-position='down']").attr('class', 'down');
+		$("#wrapper_down").empty();
+		$("#head_down").empty();
 	});
 	
 	$(document).on("click", "#back", function() {
