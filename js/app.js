@@ -155,6 +155,30 @@ $(document).ready(function() {
 		utils.status.show("Name modified");
 	});
 	
+	$(document).on("click", "#pick_priv", function() {
+		var open = new MozActivity({
+			name: "open",
+			/*data: {
+				type: ["text/plain", "text/txt", "text/asc"]
+			}*/
+		});
+		pick.onsuccess = function () { 
+			var reader = new FileReader();
+			reader.onload = function(e) {
+				var output = e.target.result;
+				$("#wrapper").append(file);
+			};
+			reader.readAsText(file);
+			/*var file = document.createElement("file");
+			file.src = window.URL.createObjectURL(this.result.blob);
+			console.log(file);
+			$("#wrapper").append(file);*/
+		};
+		pick.onerror = function () { 
+			alert("Can't open the file");
+		};
+	});
+	
 	/* Navigation */
 	$(document).on("click", "#generate-pair", function() {
 		wrap = "<div><input type='text' name='name' placeholder='Your Name' />" +
@@ -180,7 +204,7 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#load-priv-key", function() {
-		wrap = "<div><p>Not implemented</p></div>";
+		wrap = "<div><button id='pick_priv'>Pick from a file</button></div>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
