@@ -156,27 +156,22 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#pick_priv", function() {
-		var open = new MozActivity({
-			name: "open",
-			/*data: {
-				type: ["text/plain", "text/txt", "text/asc"]
-			}*/
+		fsearch = $('input[name=file]').val();
+		var finder = new Applait.Finder({ hidden: true });
+		var elem = "";
+		finder.search(fsearch);
+		finder.on("fileFound", function (file, fileinfo, storageName) {
+			console.log("Found file " + fileinfo.name + " at " + fileinfo.path + " in " + storageName, file);
+			elem = "<header>Results</header><ul><li><a href='#'><p>" + fileinfo.name + "</p><p>At " + fileinfo.path + "</p></a></li></ul>";
+			$('#search_results').append(elem);
 		});
-		pick.onsuccess = function () { 
-			var reader = new FileReader();
-			reader.onload = function(e) {
-				var output = e.target.result;
-				$("#wrapper").append(file);
-			};
-			reader.readAsText(file);
-			/*var file = document.createElement("file");
-			file.src = window.URL.createObjectURL(this.result.blob);
-			console.log(file);
-			$("#wrapper").append(file);*/
-		};
-		pick.onerror = function () { 
-			alert("Can't open the file");
-		};
+		/* Debug only */
+		finder.on("searchCancelled", function (message) {
+			console.log("Search cancelled");
+		});
+		finder.on("empty", function (needle) {
+			console.log("No storage medium avaliable");
+		});
 	});
 	
 	/* Navigation */
@@ -204,7 +199,8 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#load-priv-key", function() {
-		wrap = "<div><button id='pick_priv'>Pick from a file</button></div>";
+		wrap = "<div><input type='text' name='file' placeholder='Type file to search' />" +
+				"<button id='pick_priv'>Search</button></div><div data-type='list' id='search_results'></div>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);

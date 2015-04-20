@@ -22,7 +22,8 @@
     "permissions": {
         "systemXHR": {
             "description": "Used to retrive news from websites"
-        }
+        },
+		"device-storage:sdcard":{ "access": "readwrite" }
     },
 	"launch_path": "/index.html"
 }
