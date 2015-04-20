@@ -5,6 +5,7 @@ string = "";
 password = "";
 my_priv_key = "";
 my_public_key = "";
+f = null;
 
 $(document).ready(function() {
 	var db = new DB();
@@ -162,8 +163,10 @@ $(document).ready(function() {
 		finder.search(fsearch);
 		finder.on("fileFound", function (file, fileinfo, storageName) {
 			console.log("Found file " + fileinfo.name + " at " + fileinfo.path + " in " + storageName, file);
-			elem = "<header>Results</header><ul><li><a href='#'><p>" + fileinfo.name + "</p><p>At " + fileinfo.path + "</p></a></li></ul>";
+			elem = "<header>Results</header><ul><li><a href='#' id='" + file.name + "' class ='file'>" +
+					"<p>" + fileinfo.name + "</p><p>At " + fileinfo.path + "</p></a></li></ul>";
 			$('#search_results').append(elem);
+			f = file;
 		});
 		/* Debug only */
 		finder.on("searchCancelled", function (message) {
@@ -172,6 +175,34 @@ $(document).ready(function() {
 		finder.on("empty", function (needle) {
 			console.log("No storage medium avaliable");
 		});
+	});
+	
+	$(document).on("click", ".file", function() {
+		console.log(f);
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			f.src = e.target.result;
+			console.log(f.src);
+			wrap = "<div><input type='text' name='name' placeholder='Your name' />" +
+					"<input type='email' name='email' placeholder='Your email' />" +
+					"<button id='add_priv'>Add your private key</button></div>";
+			$("#wrapper_down").append(wrap);
+			$("#head_down").append("Add your priv");
+			document.querySelector('#down').className = 'current';
+			$(document).on("click", "#add_priv", function() {
+				var arr = new Array();
+				data = {
+					'name': $('input[name=name]').val(),
+					'email': $('input[name=email]').val(),
+					'pub': '',
+					'priv': f.src
+				};
+				arr.push(data);
+				db.save(arr);
+				utils.status.show("Your private key has been saved");
+			});
+		}
+		reader.readAsText(f);
 	});
 	
 	/* Navigation */
@@ -281,13 +312,18 @@ $(document).ready(function() {
 		for(i = 0; i < db.get().length; i++) {
 			name = db.get()[i].name;
 			email = db.get()[i].email;
-			if(db.get()[i].priv != "")
-				priv = "priv - ";
+			if(db.get()[i].priv != "") {
+				if(db.get()[i].pub != "") {
+					keys = "priv - pub";
+					
+				}
+				else
+					keys = "priv";
+			}
 			else
-				priv = "";
-			pub = "pub";
+				keys = "pub";
 			item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
-					"<p>" + priv + pub + "</p></a></li>";
+					"<p>" + keys + "</p></a></li>";
 			items = items + item;
 		}
 		wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
