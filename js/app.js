@@ -352,8 +352,8 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#info", function() {
-		wrap = "<div data-type='list'><p>OpenPGP let's you use PGP method to crypt/ecrypt messages.</p><br>" +
-				"<p>You can find further informations by clicking on Info icon inside every option.</p>" +
+		wrap = "<div data-type='list'><p>OpenPGP let's you use PGP method to encrypt/decrypt messages.</p><br>" +
+				"<p>You can find further informations by clicking on Info icons inside every option.</p>" +
 				"<header>Version</header><p>1.0</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info");
@@ -363,7 +363,7 @@ $(document).ready(function() {
 	$(document).on("click", "#info_gen", function() {
 		wrap = "<div><p>Here you can generate a key pair (private and public) for your email.</p><br>" +
 				"<p>This application uses a 2048 bits encryption and it will save the key pair in the local database.</p>" +
-				"<p>The passphrase you enter won't be stored anywhere and it will be used during encryption.<br></p>" +
+				"<p>The passphrase you enter won't be stored anywhere and it will be used during encryption.</p><br>" +
 				"<p>Note that it will be take some time especially on entry-level devices.</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info - Generate pair");
