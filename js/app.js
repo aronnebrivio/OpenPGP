@@ -177,6 +177,22 @@ $(document).ready(function() {
 		reader.readAsText(f);
 	});
 	
+	$(document).on("click", "#export_pub", function() {
+		email = $("#head_down").text();
+		name = email + "_pub.txt";
+		key = db.getPub(email);
+		blob = new Blob(['', key, ''], {type: "text/plain"});
+		saveAs(blob, name);
+	});
+	
+	$(document).on("click", "#export_priv", function() {
+		email = $("#head_down").text();
+		name = email + "_priv.txt";
+		key = db.getPriv(email);
+		blob = new Blob(['', key, ''], {type: "text/plain"});
+		saveAs(blob, name);
+	});
+	
 	/* Navigation */
 	$(document).on("click", "#generate-pair", function() {
 		wrap = "<div><input type='text' name='name' placeholder='Your Name' />" +
@@ -325,26 +341,37 @@ $(document).ready(function() {
 		$("#tbar").empty();
 	});	
 	
+	$(document).on("click", "#pgpmitedu", function() {
+		new MozActivity({
+			name: 'view',
+			data: {
+				type: 'url',
+				url: 'https://pgp.mit.edu'
+			}
+		});
+	});
+	
 	$(document).on("click", "#info", function() {
-		wrap = "<div><p>OpenPGP let's you use PGP method to crypt/ecrypt messages.<br>" +
-				"You can find further informations by clicking on Info icon inside every option.<br><br>" +
-				"Version: 1.0</p></div>";
+		wrap = "<div data-type='list'><p>OpenPGP let's you use PGP method to crypt/ecrypt messages.</p><br>" +
+				"<p>You can find further informations by clicking on Info icon inside every option.</p>" +
+				"<header>Version</header><p>1.0</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info");
 		$("[data-position='down']").attr('class', 'current');
 	});
 	
 	$(document).on("click", "#info_gen", function() {
-		wrap = "<div><p>Here you can generate a key pair (private and public) for your email.</p>" +
+		wrap = "<div><p>Here you can generate a key pair (private and public) for your email.</p><br>" +
 				"<p>This application uses a 2048 bits encryption and it will save the key pair in the local database.</p>" +
-				"<p>The passphrase you enter won't be stored anywhere and it will be used during encryption.</p></div>";
+				"<p>The passphrase you enter won't be stored anywhere and it will be used during encryption.<br></p>" +
+				"<p>Note that it will be take some time especially on entry-level devices.</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info - Generate pair");
 		$("[data-position='down']").attr('class', 'current');
 	});
 	
 	$(document).on("click", "#info_load_pub", function() {
-		wrap = "<div><p>Here you can search if an email has a public key stored online on https://pgp.mit.edu.</p>" +
+		wrap = "<div><p>Here you can search if an email has a public key stored online on <a href='#' id='pgpmitedu'>https://pgp.mit.edu</a>.</p><br>" +
 				"<p>Once the app finds a public key on the server, this will be shown here and with a tap on it " +
 				"you will be able to save it locally in order to send encrypted messages to this email.</p></div>";
 		$("#wrapper_down").append(wrap);
@@ -353,38 +380,39 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#info_load_priv", function() {
-		wrap = "<div><p>Here you can load your private key from a text file in your SDcard.</p>" +
-				"<p>First you'll have to search for a file that it will be displayed here if founded.<br>" +
-				"By tapping on it you will be prompted to a window where you will be able to choose the name " +
-				"of the key owner and save it locally.</p></div>";
+		wrap = "<div><p>Here you can load your private key from a text file in your SDcard.</p><br>" +
+				"<p>First you'll have to search for a file that it will be displayed here if founded.</p>" +
+				"<p>By tapping on it you will be prompted to a window where you will be able to choose the name " +
+				"of the key owner and then save it locally.</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info - Load Private key");
 		$("[data-position='down']").attr('class', 'current');
 	});
 	
 	$(document).on("click", "#info_encrypt", function() {
-		wrap = "<div><p>Here you can ecrypt a message using a public key present on the app database.</p>" +
+		wrap = "<div><p>Here you can encrypt a message using a public key present on the app database.</p><br>" +
 				"<p>First of all you have to enter the email of the receiver and the message you want to send.<br>" +
 				"Then, by clicking on 'Encrypt Message' you'll show in the textbox at the bottom the encrypted version " +
-				"of the message you wrote, ready to be sent.</p>" +
+				"of the message you wrote, ready to be sent.</p><br>" +
 				"<p>You can now copy the encrypted message or tap on the Email button on the header bar: " +
-				"it will open the system Email client ready to sent an email to the receiver you entered, with the encrypted message.</p></div>";
+				"it will open the system Email client ready to send an email to the receiver you entered, with the encrypted message.</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info - Encrypt");
 		$("[data-position='down']").attr('class', 'current');
 	});
 	
 	$(document).on("click", "#info_decrypt", function() {
-		wrap = "<div><p>Here you can decrypt a message you've received.</p>" +
-				"<p>To do this you have to enter your email, paste the encrypted message, type your passphrase and click on 'Decrypt Message'.</p>" +
-				"<p>That's all! You will be able to see the decrypted version of the message you've received!</p></div>";
+		wrap = "<div><p>Here you can decrypt a message you've received.</p><br>" +
+				"<p>In order to do this you have to enter your email, paste the encrypted message, " +
+				"type your passphrase and click on 'Decrypt Message'.</p><br>" +
+				"<p>That's all! <br>You will be able to see the decrypted version of the message you've received!</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info - Decrypt");
 		$("[data-position='down']").attr('class', 'current');
 	});
 	
 	$(document).on("click", "#info_database", function() {
-		wrap = "<div><p>Here you can manage the keys you've stored locally.</p>" +
+		wrap = "<div><p>Here you can manage the keys you've stored locally.</p><br>" +
 				"<p>By clicking on one key you will be able to change the name, export keys to files or remove it from the database.</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info - Database");
