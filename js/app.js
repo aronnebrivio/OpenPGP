@@ -113,10 +113,6 @@ $(document).ready(function() {
 			utils.status.show("Public key for <" + email + "> saved");
 		});
 	});
-	
-	$(document).on("click", "#pick_pub", function() {
-		alert("Not implemented yet.");
-	});
 		
 	$(document).on("click", "#empty", function() {
 		db.clearDB();
@@ -191,18 +187,17 @@ $(document).ready(function() {
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Generate Pair");
-		$("#tbar").append("<button disabled></button>");
+		$("#tbar").append("<button data-icon='info' id='info_gen'></button>");
 	});
 	
 	$(document).on("click", "#load-pub-key", function() {
 		wrap = "<div><input type='text' name='bob' placeholder='Type an email' />" +
-				"<button id='search_pub'>Search</button>" +
-				"<button id='pick_pub'>Pick Pub key from file</button></div>";
+				"<button id='search_pub'>Search</button></div>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Load Public Key");
-		$("#tbar").append("<button disabled></button>");
+		$("#tbar").append("<button data-icon='info' id='info_load_pub'></button>");
 	});
 	
 	$(document).on("click", "#load-priv-key", function() {
@@ -212,7 +207,7 @@ $(document).ready(function() {
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Load Private Key");
-		$("#tbar").append("<button disabled></button>");
+		$("#tbar").append("<button data-icon='info' id='info_load_priv'></button>");
 	});
 	
 	$(document).on("click", "#encrypt", function() {
@@ -224,7 +219,7 @@ $(document).ready(function() {
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Encrypt");
-		$("#tbar").append("<button id='send-e' data-icon='email'></button>");
+		$("#tbar").append("<button id='send-e' data-icon='email'></button><button data-icon='info' id='info_encrypt'></button");
 	});
 	
 	$(document).on("click", "#decrypt", function() {
@@ -237,7 +232,7 @@ $(document).ready(function() {
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Decrypt");
-		$("#tbar").append("<button disabled></button>");
+		$("#tbar").append("<button data-icon='info' id='info_decrypt'></button>");
 	});
 	
 	$(document).on("click", "#database", function() {
@@ -269,7 +264,7 @@ $(document).ready(function() {
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
 		$("#head").append("Database");
-		$("#tbar").append("<button disabled></button>");
+		$("#tbar").append("<button data-icon='info' id='info_database'></button");
 	});
 	
 	$(document).on("click", ".keys", function() {
@@ -277,9 +272,15 @@ $(document).ready(function() {
 		console.log(name);
 		wrap = "<div><input type='text' name='name' placeholder='" + name + "' />" +
 				"<button id='update'>Update</button>" +
+				"<button id='export_priv'>Export private key</button>" +
+				"<button id='export_pub'>Export public key</button>" +
 				"<button id='remove' class='danger'>Remove key</button></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append(this.id);
+		if(db.getPub(this.id) == "")
+			document.querySelector('#export_pub').setAttribute('disabled', true);
+		if(db.getPriv(this.id) == "")
+			document.querySelector('#export_priv').setAttribute('disabled', true);
 		document.querySelector('#down').className = 'current';
 	});
 	
@@ -308,7 +309,7 @@ $(document).ready(function() {
 					"<div><button id='empty' class='danger'>Clear database</button><div>";
 			$("#wrapper").append(wrap);
 			$("#head").append("Database");
-			$("#tbar").append("<button disabled></button>");
+			$("#tbar").append("<button data-icon='info' id='info_database'></button");
 		}
 		document.querySelector("#wrapper_down").className = "content scrollable header";
 		$("[data-position='down']").attr('class', 'down');
@@ -323,4 +324,70 @@ $(document).ready(function() {
 		$("#head").empty();
 		$("#tbar").empty();
 	});	
+	
+	$(document).on("click", "#info", function() {
+		wrap = "<div><p>OpenPGP let's you use PGP method to crypt/ecrypt messages.<br>" +
+				"You can find further informations by clicking on Info icon inside every option.<br><br>" +
+				"Version: 1.0</p></div>";
+		$("#wrapper_down").append(wrap);
+		$("#head_down").append("Info");
+		$("[data-position='down']").attr('class', 'current');
+	});
+	
+	$(document).on("click", "#info_gen", function() {
+		wrap = "<div><p>Here you can generate a key pair (private and public) for your email.</p>" +
+				"<p>This application uses a 2048 bits encryption and it will save the key pair in the local database.</p>" +
+				"<p>The passphrase you enter won't be stored anywhere and it will be used during encryption.</p></div>";
+		$("#wrapper_down").append(wrap);
+		$("#head_down").append("Info - Generate pair");
+		$("[data-position='down']").attr('class', 'current');
+	});
+	
+	$(document).on("click", "#info_load_pub", function() {
+		wrap = "<div><p>Here you can search if an email has a public key stored online on https://pgp.mit.edu.</p>" +
+				"<p>Once the app finds a public key on the server, this will be shown here and with a tap on it " +
+				"you will be able to save it locally in order to send encrypted messages to this email.</p></div>";
+		$("#wrapper_down").append(wrap);
+		$("#head_down").append("Info - Load Public key");
+		$("[data-position='down']").attr('class', 'current');
+	});
+	
+	$(document).on("click", "#info_load_priv", function() {
+		wrap = "<div><p>Here you can load your private key from a text file in your SDcard.</p>" +
+				"<p>First you'll have to search for a file that it will be displayed here if founded.<br>" +
+				"By tapping on it you will be prompted to a window where you will be able to choose the name " +
+				"of the key owner and save it locally.</p></div>";
+		$("#wrapper_down").append(wrap);
+		$("#head_down").append("Info - Load Private key");
+		$("[data-position='down']").attr('class', 'current');
+	});
+	
+	$(document).on("click", "#info_encrypt", function() {
+		wrap = "<div><p>Here you can ecrypt a message using a public key present on the app database.</p>" +
+				"<p>First of all you have to enter the email of the receiver and the message you want to send.<br>" +
+				"Then, by clicking on 'Encrypt Message' you'll show in the textbox at the bottom the encrypted version " +
+				"of the message you wrote, ready to be sent.</p>" +
+				"<p>You can now copy the encrypted message or tap on the Email button on the header bar: " +
+				"it will open the system Email client ready to sent an email to the receiver you entered, with the encrypted message.</p></div>";
+		$("#wrapper_down").append(wrap);
+		$("#head_down").append("Info - Encrypt");
+		$("[data-position='down']").attr('class', 'current');
+	});
+	
+	$(document).on("click", "#info_decrypt", function() {
+		wrap = "<div><p>Here you can decrypt a message you've received.</p>" +
+				"<p>To do this you have to enter your email, paste the encrypted message, type your passphrase and click on 'Decrypt Message'.</p>" +
+				"<p>That's all! You will be able to see the decrypted version of the message you've received!</p></div>";
+		$("#wrapper_down").append(wrap);
+		$("#head_down").append("Info - Decrypt");
+		$("[data-position='down']").attr('class', 'current');
+	});
+	
+	$(document).on("click", "#info_database", function() {
+		wrap = "<div><p>Here you can manage the keys you've stored locally.</p>" +
+				"<p>By clicking on one key you will be able to change the name, export keys to files or remove it from the database.</p></div>";
+		$("#wrapper_down").append(wrap);
+		$("#head_down").append("Info - Database");
+		$("[data-position='down']").attr('class', 'current');
+	});
 });
