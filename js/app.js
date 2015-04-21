@@ -10,22 +10,16 @@ f = null;
 $(document).ready(function() {
 	var db = new DB();
 
-	console.log(db.get());
-
 	$(document).on("click", "#btn-generate", function() {
 		utils.status.show("Generating key pair, please wait it could take a while");
 		name = $('input[name=name]').val();
 		email = $('input[name=email]').val();
 		password = $('input[name=pwd]').val();
 		string = name + " <" + email + ">";
-		console.log("name: " + name + "\nemail: " + email + "\npassword: " + password + "\nstring: " + string);
 		my_key = openpgp.generateKeyPair({numBits: 2048, userId: string, passphrase: password})
 			.then(function(key_pair) {
 				my_priv_key = key_pair.privateKeyArmored;
 				my_public_key = key_pair.publicKeyArmored;
-				console.log("My private key:\n" + my_priv_key + "\n");
-				console.log("My public key:\n" + my_public_key + "\n");
-				
 				/* local storage */
 				var arr = new Array();
 				data = {
@@ -87,9 +81,7 @@ $(document).ready(function() {
 		emailURI = encodeURIComponent(email);
 		xhr = new XMLHttpRequest({mozSystem: true});
 		url = "https://pgp.mit.edu/pks/lookup?search=" + emailURI + "&op=get";
-		console.log(url);
 		xhr.open("GET", url, true);
-		
 		xhr.timeout = 100000;
 		xhr.addEventListener('timeout', function() {
 			alert("Nessuna risposta dal server. Controllare la connessione e toccare l'icona Ricarica.");
@@ -98,7 +90,6 @@ $(document).ready(function() {
 			if(xhr.status == 200) {
 		    	page = $(xhr.response);
 		    	pub_to_import = $(xhr.response)[9].innerHTML;
-		    	console.log(pub_to_import);
 		    	wrap = "<div data-type='list'><header>Results</header>" +
 		    			"<ul><li><a href='#' id='a'><p>" + email + "</p>" +
 		    			"<p>Tap here to save his public key</p></a></li></ul>";
@@ -119,7 +110,7 @@ $(document).ready(function() {
 			};
 			arr.push(data);
 			db.save(arr);
-			utils.status.show("Pub key saved");
+			utils.status.show("Public key for <" + email + "> saved");
 		});
 	});
 	
@@ -129,15 +120,11 @@ $(document).ready(function() {
 		
 	$(document).on("click", "#empty", function() {
 		db.clearDB();
-		console.log(localStorage.length);
 		utils.status.show("Database empty");
 	});
 	
 	$(document).on("click", "#send-e", function() {
-		console.log(bob);
-		console.log(emsg);
 		body = encodeURIComponent(emsg);
-		console.log(body);
 		var encrMail = new MozActivity({
 			name: "new",
 			data: {
@@ -150,10 +137,8 @@ $(document).ready(function() {
 	$(document).on("click", "#update", function() {
 		name = $('input[name=name]').val();
 		email = $("#head_down").text();
-		console.log(name);
-		console.log(email);
 		db.modName(email, name);
-		utils.status.show("Name modified");
+		utils.status.show("Name for <" + email + "> modified");
 	});
 	
 	$(document).on("click", "#pick_priv", function() {
@@ -162,27 +147,18 @@ $(document).ready(function() {
 		var elem = "";
 		finder.search(fsearch);
 		finder.on("fileFound", function (file, fileinfo, storageName) {
-			console.log("Found file " + fileinfo.name + " at " + fileinfo.path + " in " + storageName, file);
+			found = true;
 			elem = "<header>Results</header><ul><li><a href='#' id='" + file.name + "' class ='file'>" +
 					"<p>" + fileinfo.name + "</p><p>At " + fileinfo.path + "</p></a></li></ul>";
 			$('#search_results').append(elem);
 			f = file;
 		});
-		/* Debug only */
-		finder.on("searchCancelled", function (message) {
-			console.log("Search cancelled");
-		});
-		finder.on("empty", function (needle) {
-			console.log("No storage medium avaliable");
-		});
 	});
 	
 	$(document).on("click", ".file", function() {
-		console.log(f);
 		var reader = new FileReader();
 		reader.onload = function(e) {
 			f.src = e.target.result;
-			console.log(f.src);
 			wrap = "<div><input type='text' name='name' placeholder='Your name' />" +
 					"<input type='email' name='email' placeholder='Your email' />" +
 					"<button id='add_priv'>Add your private key</button></div>";
@@ -199,7 +175,7 @@ $(document).ready(function() {
 				};
 				arr.push(data);
 				db.save(arr);
-				utils.status.show("Your private key has been saved");
+				utils.status.show("Private key for <" + $('input[name=email]').val() + "> saved");
 			});
 		}
 		reader.readAsText(f);
@@ -265,20 +241,23 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#database", function() {
+		document.querySelector("#wrapper_down").className = "content scrollable header database";
 		items = "";
 		if(db.get().length != 0) {
 			for(i = 0; i < db.get().length; i++) {
 				console.log(i);
 				name = db.get()[i].name;
 				email = db.get()[i].email;
-				if(db.get()[i].priv != "")
-					priv = "priv - ";
+				if(db.get()[i].priv != "") {
+					if(db.get()[i].pub != "")
+						keys = "priv - pub";
+					else
+						keys = "priv";
+				}
 				else
-					priv = "";
-				pub = "pub";
+					keys = "pub";
 				item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
-						"<p>" + priv + pub + "</p></a></li>";
-				console.log(item);
+						"<p>" + keys + "</p></a></li>";
 				items = items + item;
 			}
 			wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
@@ -305,32 +284,33 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#close", function() {
-		$("#wrapper").empty();
-		$("#head").empty();
-		$("#tbar").empty();
-		items = "";
-		for(i = 0; i < db.get().length; i++) {
-			name = db.get()[i].name;
-			email = db.get()[i].email;
-			if(db.get()[i].priv != "") {
-				if(db.get()[i].pub != "") {
-					keys = "priv - pub";
-					
+		if($("#wrapper_down").attr('class') == "content scrollable header database") {
+			$("#wrapper").empty();
+			$("#head").empty();
+			$("#tbar").empty();
+			items = "";
+			for(i = 0; i < db.get().length; i++) {
+				name = db.get()[i].name;
+				email = db.get()[i].email;
+				if(db.get()[i].priv != "") {
+					if(db.get()[i].pub != "")
+						keys = "priv - pub";
+					else
+						keys = "priv";
 				}
 				else
-					keys = "priv";
+					keys = "pub";
+				item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
+						"<p>" + keys + "</p></a></li>";
+				items = items + item;
 			}
-			else
-				keys = "pub";
-			item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
-					"<p>" + keys + "</p></a></li>";
-			items = items + item;
+			wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
+					"<div><button id='empty' class='danger'>Clear database</button><div>";
+			$("#wrapper").append(wrap);
+			$("#head").append("Database");
+			$("#tbar").append("<button disabled></button>");
 		}
-		wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
-				"<div><button id='empty' class='danger'>Clear database</button><div>";
-		$("#wrapper").append(wrap);
-		$("#head").append("Database");
-		$("#tbar").append("<button disabled></button>");
+		document.querySelector("#wrapper_down").className = "content scrollable header";
 		$("[data-position='down']").attr('class', 'down');
 		$("#wrapper_down").empty();
 		$("#head_down").empty();
