@@ -11,27 +11,35 @@ $(document).ready(function() {
 	var db = new DB();
 
 	$(document).on("click", "#btn-generate", function() {
-		utils.status.show("Generating key pair, please wait it could take a while");
-		name = $('input[name=name]').val();
-		email = $('input[name=email]').val();
 		password = $('input[name=pwd]').val();
-		string = name + " <" + email + ">";
-		my_key = openpgp.generateKeyPair({numBits: 2048, userId: string, passphrase: password})
-			.then(function(key_pair) {
-				my_priv_key = key_pair.privateKeyArmored;
-				my_public_key = key_pair.publicKeyArmored;
-				/* local storage */
-				var arr = new Array();
-				data = {
-					'name':name,
-					'email':email,
-					'pub':my_public_key,
-					'priv':my_priv_key
-				};
-				arr.push(data);
-				db.save(arr);
-				utils.status.show("Key Pair created and saved");
-			});
+		password2 = $('input[name=pwd2]').val();
+		if(password === password2) {
+			utils.status.show("Generating key pair, please wait it could take a while");
+			name = $('input[name=name]').val();
+			email = $('input[name=email]').val();
+			string = name + " <" + email + ">";
+			my_key = openpgp.generateKeyPair({numBits: 2048, userId: string, passphrase: password})
+				.then(function(key_pair) {
+					my_priv_key = key_pair.privateKeyArmored;
+					my_public_key = key_pair.publicKeyArmored;
+					/* local storage */
+					var arr = new Array();
+					data = {
+						'name':name,
+						'email':email,
+						'pub':my_public_key,
+						'priv':my_priv_key
+					};
+					arr.push(data);
+					db.save(arr);
+					utils.status.show("Key Pair created and saved");
+				});
+		}
+		else {
+			$('input[name=pwd]').val("");
+			$('input[name=pwd2]').val("");
+			alert("You entered two different passphrases. Check them out and try again.");
+		}
 	});
 	
 	$(document).on("click", "#btn-encrypt", function() {
@@ -138,16 +146,23 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#pick_priv", function() {
+		$('#search_results').empty();
 		fsearch = $('input[name=file]').val();
 		var finder = new Applait.Finder({ hidden: true });
+		var elems = "<header>Results</header>";
 		var elem = "";
 		finder.search(fsearch);
-		finder.on("fileFound", function (file, fileinfo, storageName) {
-			found = true;
-			elem = "<header>Results</header><ul><li><a href='#' id='" + file.name + "' class ='file'>" +
+		finder.on("fileFound", function(file, fileinfo, storageName) {
+			elem = "<ul><li><a href='#' id='" + file.name + "' class ='file'>" +
 					"<p>" + fileinfo.name + "</p><p>At " + fileinfo.path + "</p></a></li></ul>";
-			$('#search_results').append(elem);
 			f = file;
+			elems = elems + elem;
+		});
+		finder.on("searchComplete", function(fsearch, filematchcount) {
+			if(filematchcount != 0)
+				$('#search_results').append(elems);
+			else
+				alert("No files found.");
 		});
 	});
 	
@@ -198,6 +213,7 @@ $(document).ready(function() {
 		wrap = "<div><input type='text' name='name' placeholder='Your Name' />" +
 				"<input type='email' name='email' placeholder='Your Email' />" +
 				"<input type='password' name='pwd' placeholder='Passphrase' />" +
+				"<input type='password' name='pwd2' placeholder='Re-enter passphrase' />" +
 				"<button id='btn-generate'>Generate Pair</button></div>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';

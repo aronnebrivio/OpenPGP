@@ -23,7 +23,10 @@
         "systemXHR": {
             "description": "Used to retrive news from websites"
         },
-		"device-storage:sdcard":{ "access": "readwrite" }
+		"device-storage:sdcard":{ 
+			"access": "readwrite",
+			"description": "Used to import/export keys from files into sdcard"
+		}
     },
 	"launch_path": "/index.html"
 }
