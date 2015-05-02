@@ -6,9 +6,89 @@ password = "";
 my_priv_key = "";
 my_public_key = "";
 f = null;
+db = null;
+finder = null;
+needle = "";
+elems = "";
+
+function onlineSearch() {
+	emailURI = encodeURIComponent(email);
+	xhr = new XMLHttpRequest({mozSystem: true});
+	url = "https://pgp.mit.edu/pks/lookup?search=" + emailURI + "&op=get";
+	xhr.open("GET", url, true);
+	xhr.timeout = 100000;
+	xhr.addEventListener('timeout', function() {
+		alert("No response from server. Check your connectivity and tap Reload.");
+	});
+	xhr.onload = function() {
+		if(xhr.status == 200) {
+	    	page = $(xhr.response);
+	    	pub_to_import = $(xhr.response)[9].innerHTML;
+	    	wrap = "<header>Online Results</header>" +
+	    			"<ul><li><a href='#' id='a'><p>" + email + "</p>" +
+	    			"<p>Tap here to save his public key</p></a></li></ul>";
+	    	$("#online_res").append(wrap);
+		}
+		else if(xhr.status == 404) {
+			utils.status.show("No online results found");
+		}
+	}
+	xhr.send();
+}
+
+function localSearch(head, needle) {
+	fsearch = needle;
+	finder = new Applait.Finder({ hidden: true });
+	elems = head;
+	var elem = "";
+	finder.search(fsearch);
+	finder.on("fileFound", function(file, fileinfo, storageName) {
+		elem = "<ul><li><a href='#' id='" + file.name + "' class ='file'>" +
+				"<p>" + fileinfo.name + "</p><p>At " + fileinfo.path + "</p></a></li></ul>";
+		f = file;
+		elems = elems + elem;
+	});
+	finder.on("searchComplete", function(fsearch, filematchcount) {
+		if(filematchcount != 0)
+			$('#local_res').append(elems);
+		else
+			utils.status.show("No files found.");
+	});
+};
+
+function refreshDB() {
+	$("#wrapper").empty();
+	$("#head").empty();
+	$("#tbar").empty();
+	items = "";
+	if(db.get().length != 0) {
+		for(i = 0; i < db.get().length; i++) {
+			name = db.get()[i].name;
+			email = db.get()[i].email;
+			if(db.get()[i].priv != "") {
+				if(db.get()[i].pub != "")
+					keys = "priv - pub";
+				else
+					keys = "priv";
+			}
+			else
+				keys = "pub";
+			item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
+					"<p>" + keys + "</p></a></li>";
+			items = items + item;
+		}
+		wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
+				"<div><button id='empty' class='danger'>Clear database</button><div>";
+	}
+	else
+		wrap = "<div><p>Database empty</p></div>";
+	$("#wrapper").append(wrap);
+	$("#head").append("Database");
+	$("#tbar").append("<button data-icon='info' id='info_database'></button");
+};
 
 $(document).ready(function() {
-	var db = new DB();
+	db = new DB();
 
 	$(document).on("click", "#btn-generate", function() {
 		password = $('input[name=pwd]').val();
@@ -85,29 +165,12 @@ $(document).ready(function() {
 	});
 
 	$(document).on("click", "#search_pub", function() {
+		$('#local_res').empty();
+		$('#online_res').empty();
+		head = "<header>Local Results</header>";
 		email = $('input[name=bob]').val();
-		emailURI = encodeURIComponent(email);
-		xhr = new XMLHttpRequest({mozSystem: true});
-		url = "https://pgp.mit.edu/pks/lookup?search=" + emailURI + "&op=get";
-		xhr.open("GET", url, true);
-		xhr.timeout = 100000;
-		xhr.addEventListener('timeout', function() {
-			alert("Nessuna risposta dal server. Controllare la connessione e toccare l'icona Ricarica.");
-		});
-		xhr.onload = function() {
-			if(xhr.status == 200) {
-		    	page = $(xhr.response);
-		    	pub_to_import = $(xhr.response)[9].innerHTML;
-		    	wrap = "<div data-type='list'><header>Results</header>" +
-		    			"<ul><li><a href='#' id='a'><p>" + email + "</p>" +
-		    			"<p>Tap here to save his public key</p></a></li></ul>";
-		    	$("#wrapper").append(wrap);
-			}
-			else if(xhr.status == 404) {
-				alert("No results found");
-			}
-		}
-		xhr.send();
+		onlineSearch();
+		localSearch(head, email);
 		$(document).on("click", "#a", function() {
 			var arr = new Array();
 			data = {
@@ -146,24 +209,10 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#pick_priv", function() {
-		$('#search_results').empty();
-		fsearch = $('input[name=file]').val();
-		var finder = new Applait.Finder({ hidden: true });
-		var elems = "<header>Results</header>";
-		var elem = "";
-		finder.search(fsearch);
-		finder.on("fileFound", function(file, fileinfo, storageName) {
-			elem = "<ul><li><a href='#' id='" + file.name + "' class ='file'>" +
-					"<p>" + fileinfo.name + "</p><p>At " + fileinfo.path + "</p></a></li></ul>";
-			f = file;
-			elems = elems + elem;
-		});
-		finder.on("searchComplete", function(fsearch, filematchcount) {
-			if(filematchcount != 0)
-				$('#search_results').append(elems);
-			else
-				alert("No files found.");
-		});
+		$('#local_res').empty();
+		head = "<header>Results</header>";
+		tosearch = $('input[name=file]').val();
+		localSearch(head, tosearch);
 	});
 	
 	$(document).on("click", ".file", function() {
@@ -213,34 +262,7 @@ $(document).ready(function() {
 		console.log(email);
 		db.remove(email);
 		utils.status.show("Key removed from local database");
-		$("#wrapper").empty();
-		$("#head").empty();
-		$("#tbar").empty();
-		items = "";
-		if(db.get().length != 0) {
-			for(i = 0; i < db.get().length; i++) {
-				name = db.get()[i].name;
-				email = db.get()[i].email;
-				if(db.get()[i].priv != "") {
-					if(db.get()[i].pub != "")
-						keys = "priv - pub";
-					else
-						keys = "priv";
-				}
-				else
-					keys = "pub";
-				item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
-						"<p>" + keys + "</p></a></li>";
-				items = items + item;
-			}
-			wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
-					"<div><button id='empty' class='danger'>Clear database</button><div>";
-		}
-		else
-			wrap = "<div><p>Database empty</p></div>";
-		$("#wrapper").append(wrap);
-		$("#head").append("Database");
-		$("#tbar").append("<button data-icon='info' id='info_database'></button");
+		refreshDB();
 		document.querySelector("#wrapper_down").className = "content scrollable header";
 		$("[data-position='down']").attr('class', 'down');
 		$("#wrapper_down").empty();
@@ -263,7 +285,8 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#load-pub-key", function() {
 		wrap = "<div><input type='text' name='bob' placeholder='Type an email' />" +
-				"<button id='search_pub'>Search</button></div>";
+				"<button id='search_pub'>Search</button></div><div data-type='list' id='online_res'>" +
+				"</div><div data-type='list' id='local_res'></div>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
@@ -273,7 +296,7 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#load-priv-key", function() {
 		wrap = "<div><input type='text' name='file' placeholder='Type file to search' />" +
-				"<button id='pick_priv'>Search</button></div><div data-type='list' id='search_results'></div>";
+				"<button id='pick_priv'>Search</button></div><div data-type='list' id='local_res'></div>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
@@ -308,34 +331,9 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#database", function() {
 		document.querySelector("#wrapper_down").className = "content scrollable header database";
-		items = "";
-		if(db.get().length != 0) {
-			for(i = 0; i < db.get().length; i++) {
-				console.log(i);
-				name = db.get()[i].name;
-				email = db.get()[i].email;
-				if(db.get()[i].priv != "") {
-					if(db.get()[i].pub != "")
-						keys = "priv - pub";
-					else
-						keys = "priv";
-				}
-				else
-					keys = "pub";
-				item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
-						"<p>" + keys + "</p></a></li>";
-				items = items + item;
-			}
-			wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
-					"<div><button id='empty' class='danger'>Clear database</button><div>";
-		}
-		else
-			wrap = "<div><p>Database empty</p></div>";
+		refreshDB();
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
-		$("#wrapper").append(wrap);
-		$("#head").append("Database");
-		$("#tbar").append("<button data-icon='info' id='info_database'></button");
 	});
 	
 	$(document).on("click", ".keys", function() {
@@ -357,30 +355,7 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#close", function() {
 		if($("#wrapper_down").attr('class') == "content scrollable header database") {
-			$("#wrapper").empty();
-			$("#head").empty();
-			$("#tbar").empty();
-			items = "";
-			for(i = 0; i < db.get().length; i++) {
-				name = db.get()[i].name;
-				email = db.get()[i].email;
-				if(db.get()[i].priv != "") {
-					if(db.get()[i].pub != "")
-						keys = "priv - pub";
-					else
-						keys = "priv";
-				}
-				else
-					keys = "pub";
-				item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
-						"<p>" + keys + "</p></a></li>";
-				items = items + item;
-			}
-			wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
-					"<div><button id='empty' class='danger'>Clear database</button><div>";
-			$("#wrapper").append(wrap);
-			$("#head").append("Database");
-			$("#tbar").append("<button data-icon='info' id='info_database'></button");
+			refreshDB();
 		}
 		document.querySelector("#wrapper_down").className = "content scrollable header";
 		$("[data-position='down']").attr('class', 'down');
@@ -426,9 +401,12 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#info_load_pub", function() {
-		wrap = "<div><p>Here you can search if an email has a public key stored online on <a href='#' id='pgpmitedu'>https://pgp.mit.edu</a>.</p><br>" +
+		wrap = "<div><p>Here you can import a public key.</p><br><p>You can search if an email has a public key stored online on " +
+				"<a href='#' id='pgpmitedu'>https://pgp.mit.edu</a>, or search for a text file in your SDcard.</p><br>" +
 				"<p>Once the app finds a public key on the server, this will be shown here and with a tap on it " +
-				"you will be able to save it locally in order to send encrypted messages to this email.</p></div>";
+				"you will be able to save it locally in order to send encrypted messages to this email.</p><br>" +
+				"<p>If the app finds a file matching the search query, you will be prompted to a window where " +
+				"you will be able to choose the name of the key owner and then save it locally.</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info - Load Public key");
 		$("[data-position='down']").attr('class', 'current');
