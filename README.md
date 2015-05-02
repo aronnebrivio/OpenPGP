@@ -10,4 +10,12 @@ It's possible to:
 
 ##History
 - **1.0**   
-First version   
+First version  
+- **1.5**
+Added double check of the passphrase while generating a new pair   
+It's now possible to import a public key from file   
+Delete a single key is now working   
+Fixed the appears of "RESULTS" string for every file found   
+Updated Gaia Components   
+Less spaghetti code style   
+
