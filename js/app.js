@@ -208,6 +208,45 @@ $(document).ready(function() {
 		saveAs(blob, name);
 	});
 	
+	$(document).on("click", "#remove", function() {
+		email = $('#head_down').html();
+		console.log(email);
+		db.remove(email);
+		utils.status.show("Key removed from local database");
+		$("#wrapper").empty();
+		$("#head").empty();
+		$("#tbar").empty();
+		items = "";
+		if(db.get().length != 0) {
+			for(i = 0; i < db.get().length; i++) {
+				name = db.get()[i].name;
+				email = db.get()[i].email;
+				if(db.get()[i].priv != "") {
+					if(db.get()[i].pub != "")
+						keys = "priv - pub";
+					else
+						keys = "priv";
+				}
+				else
+					keys = "pub";
+				item = "<li><a href='#' id='" + email + "' class='keys'><p>" + name + " - " + email + "</p>" +
+						"<p>" + keys + "</p></a></li>";
+				items = items + item;
+			}
+			wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
+					"<div><button id='empty' class='danger'>Clear database</button><div>";
+		}
+		else
+			wrap = "<div><p>Database empty</p></div>";
+		$("#wrapper").append(wrap);
+		$("#head").append("Database");
+		$("#tbar").append("<button data-icon='info' id='info_database'></button");
+		document.querySelector("#wrapper_down").className = "content scrollable header";
+		$("[data-position='down']").attr('class', 'down');
+		$("#wrapper_down").empty();
+		$("#head_down").empty();
+	});
+	
 	/* Navigation */
 	$(document).on("click", "#generate-pair", function() {
 		wrap = "<div><input type='text' name='name' placeholder='Your Name' />" +

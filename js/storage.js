@@ -48,6 +48,16 @@ function DB() {
 		}	
 	};
 	
+	this.remove = function(email) {
+		for(var i = 0; i < db.length; i++) {
+			if(db[i].email === email) {
+				db.splice(i, 1);
+				console.log(db);
+				localStorage.setItem('mydb', JSON.stringify(db));
+			}
+		}
+	};
+	
 	/* DEBUG ONLY */
 	this.clearDB = function() {
 		localStorage.removeItem('mydb');
@@ -58,7 +68,7 @@ function DB() {
 
 function init() {
 	var db = new Array();
-	var initdb = JSON.stringify(db)
+	var initdb = JSON.stringify(db);
 	if ((localStorage.getItem('mydb')) === null) {
 		localStorage.setItem('mydb', initdb);
 		return db;
