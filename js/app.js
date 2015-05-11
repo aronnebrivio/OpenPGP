@@ -1,3 +1,4 @@
+/* Global vars */
 wrap = "";
 name = "";
 email = "";
@@ -10,7 +11,9 @@ db = null;
 finder = null;
 needle = "";
 elems = "";
+keyType = "";
 
+/* Find a key from server od from file */
 function onlineSearch() {
 	emailURI = encodeURIComponent(email);
 	xhr = new XMLHttpRequest({mozSystem: true});
@@ -36,14 +39,16 @@ function onlineSearch() {
 	xhr.send();
 }
 
-function localSearch(head, needle) {
+function localSearch(head, needle, kt) {
+	keyType = kt;
+	console.log(keyType);
 	fsearch = needle;
 	finder = new Applait.Finder({ hidden: true });
 	elems = head;
 	var elem = "";
 	finder.search(fsearch);
 	finder.on("fileFound", function(file, fileinfo, storageName) {
-		elem = "<ul><li><a href='#' id='" + file.name + "' class ='file'>" +
+		elem = "<ul><li><a href='#' id='" + file.name + "' class ='file " + keyType + "'>" +
 				"<p>" + fileinfo.name + "</p><p>At " + fileinfo.path + "</p></a></li></ul>";
 		f = file;
 		elems = elems + elem;
@@ -56,6 +61,7 @@ function localSearch(head, needle) {
 	});
 };
 
+/* Refresh db after modifying it */
 function refreshDB() {
 	$("#wrapper").empty();
 	$("#head").empty();
@@ -87,41 +93,169 @@ function refreshDB() {
 	$("#tbar").append("<button data-icon='info' id='info_database'></button");
 };
 
+/* Update private or public key if an email is already in the database */
+function updatePriv(email, priv) {
+	console.log("update priv");
+	if(db.hasPriv(email)) {
+		if(confirm("In the database there is already a private key for this email, do you want to proceed anyway?")) {
+			db.modPriv(email, priv);
+			utils.status.show("Private key for <" + email + "> updated. Consider to remove the file from SD Card.");
+		}
+	}
+	else {
+		db.modPriv(email, priv);
+		utils.status.show("Added private key for <" + email + ">. Consider to remove the file from SD Card.");
+	}
+};
+
+function updatePub(email, pub) { 
+	console.log("update pub");
+	if(db.hasPub(email)) {
+		if(confirm("In the database there is already a public key for this email, do you want to proceed anyway?")) {
+			db.modPub(email, pub);
+			console.log("modded pub");
+			utils.status.show("Public key for <" + email + "> updated.");
+		}
+	}
+	else {
+		db.modPub(email, pub);
+		utils.status.show("Added public key for <" + email + ">.");
+	}
+};
+
 $(document).ready(function() {
 	db = new DB();
-
+	
+	/* Generate pair - pick keys */
 	$(document).on("click", "#btn-generate", function() {
 		password = $('input[name=pwd]').val();
 		password2 = $('input[name=pwd2]').val();
-		if(password === password2) {
-			utils.status.show("Generating key pair, please wait it could take a while");
-			name = $('input[name=name]').val();
-			email = $('input[name=email]').val();
-			string = name + " <" + email + ">";
-			my_key = openpgp.generateKeyPair({numBits: 2048, userId: string, passphrase: password})
-				.then(function(key_pair) {
-					my_priv_key = key_pair.privateKeyArmored;
-					my_public_key = key_pair.publicKeyArmored;
-					/* local storage */
-					var arr = new Array();
-					data = {
-						'name':name,
-						'email':email,
-						'pub':my_public_key,
-						'priv':my_priv_key
-					};
-					arr.push(data);
-					db.save(arr);
-					utils.status.show("Key Pair created and saved");
-				});
+		email = $('input[name=email]').val();
+		if(!db.contains(email)) {
+			if(password === password2) {
+				utils.status.show("Generating key pair, please wait it could take a while");
+				name = $('input[name=name]').val();
+				string = name + " <" + email + ">";
+				my_key = openpgp.generateKeyPair({numBits: 2048, userId: string, passphrase: password})
+					.then(function(key_pair) {
+						my_priv_key = key_pair.privateKeyArmored;
+						my_public_key = key_pair.publicKeyArmored;
+						/* local storage */
+						var arr = new Array();
+						data = {
+							'name':name,
+							'email':email,
+							'pub':my_public_key,
+							'priv':my_priv_key
+						};
+						arr.push(data);
+						db.save(arr);
+						utils.status.show("Key Pair created and saved");
+					});
+			}
+			else {
+				$('input[name=pwd]').val("");
+				$('input[name=pwd2]').val("");
+				alert("You entered two different passphrases. Check them out and try again.");
+			}
 		}
 		else {
-			$('input[name=pwd]').val("");
-			$('input[name=pwd2]').val("");
-			alert("You entered two different passphrases. Check them out and try again.");
+			alert("Email <" + email + "> already present on the database, aborted.")
 		}
 	});
 	
+	$(document).on("click", "#search_pub", function() {
+		$('#local_res').empty();
+		$('#online_res').empty();
+		head = "<header>Local Results</header>";
+		email = $('input[name=bob]').val();
+		onlineSearch();
+		localSearch(head, email, "pub");
+		$(document).on("click", "#a", function() {
+			if(!db.contains(email)) {
+				var arr = new Array();
+				data = {
+					'name':'undefined',
+					'email':email,
+					'pub':pub_to_import,
+					'priv':''
+				};
+				arr.push(data);
+				db.save(arr);
+				utils.status.show("Public key for <" + email + "> saved");
+			}
+			else
+				updatePub(email, pub_to_import);
+		});
+	});
+	
+	$(document).on("click", "#pick_priv", function() {
+		$('#local_res').empty();
+		head = "<header>Results</header>";
+		tosearch = $('input[name=file]').val();
+		localSearch(head, tosearch, "priv");
+	});
+	
+	$(document).on("click", ".file", function() {
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			f.src = e.target.result;
+			console.log(keyType);
+			if(keyType == "priv") {
+				wrap = "<div><input type='text' name='name' placeholder='Your name' />" +
+						"<input type='email' name='email' placeholder='Your email' />" +
+						"<button id='add_priv'>Add your private key</button></div>";
+				$("#wrapper_down").append(wrap);
+				$("#head_down").append("Add your private key");
+				document.querySelector('#down').className = 'current';
+				$(document).on("click", "#add_priv", function() {
+					email = $('input[name=email]').val();
+					if(!db.contains(email)) {
+						var arr = new Array();
+						data = {
+							'name': $('input[name=name]').val(),
+							'email': email,
+							'pub': '',
+							'priv': f.src
+						};
+						arr.push(data);
+						db.save(arr);
+						utils.status.show("Private key for <" + email + "> saved. Consider to remove the file from SD Card.");
+					}
+					else
+						updatePriv(email, f.src);
+				});
+			}
+			else {
+				wrap = "<div><input type='text' name='name' placeholder='Name' />" +
+						"<input type='email' name='email' placeholder='Email' />" +
+						"<button id='add_priv'>Add public key</button></div>";
+				$("#wrapper_down").append(wrap);
+				$("#head_down").append("Add public key");
+				document.querySelector('#down').className = 'current';
+				$(document).on("click", "#add_priv", function() {
+					email = $('input[name=email]').val();
+					if(!db.contains(email)) {
+						var arr = new Array();
+						data = {
+							'name': $('input[name=name]').val(),
+							'email': email,
+							'pub': f.src,
+							'priv': ''
+						};
+						arr.push(data);
+						db.save(arr);
+						utils.status.show("Public key for <" + email + "> saved.");
+					}
+					else
+						updatePub(email, f.src);
+				});				
+			}
+		}
+		reader.readAsText(f);
+	});
+	
+	/* Encrypt - Decrypt functions */
 	$(document).on("click", "#btn-encrypt", function() {
 		bob = $('input[name=bob]').val();
 		var bool = false;
@@ -143,7 +277,7 @@ $(document).ready(function() {
 				});
 		}
 		else
-			alert("Email not present in the local database");
+			alert("Email <" + bob + "> not present in the local database");
 	});
 	
 	$(document).on("click", "#btn-decrypt", function() {
@@ -163,44 +297,8 @@ $(document).ready(function() {
 				alert("Decrypting error");
 			});
 	});
-
-	$(document).on("click", "#search_pub", function() {
-		$('#local_res').empty();
-		$('#online_res').empty();
-		head = "<header>Local Results</header>";
-		email = $('input[name=bob]').val();
-		onlineSearch();
-		localSearch(head, email);
-		$(document).on("click", "#a", function() {
-			var arr = new Array();
-			data = {
-				'name':'undefined',
-				'email':email,
-				'pub':pub_to_import,
-				'priv':''
-			};
-			arr.push(data);
-			db.save(arr);
-			utils.status.show("Public key for <" + email + "> saved");
-		});
-	});
-		
-	$(document).on("click", "#empty", function() {
-		db.clearDB();
-		utils.status.show("Database empty");
-	});
 	
-	$(document).on("click", "#send-e", function() {
-		body = encodeURIComponent(emsg);
-		var encrMail = new MozActivity({
-			name: "new",
-			data: {
-				type: "mail",
-				url: "mailto:" + bob + "?body=" + body
-			}
-		});
-	});
-	
+	/* Manage database */
 	$(document).on("click", "#update", function() {
 		name = $('input[name=name]').val();
 		email = $("#head_down").text();
@@ -208,39 +306,24 @@ $(document).ready(function() {
 		utils.status.show("Name for <" + email + "> modified");
 	});
 	
-	$(document).on("click", "#pick_priv", function() {
-		$('#local_res').empty();
-		head = "<header>Results</header>";
-		tosearch = $('input[name=file]').val();
-		localSearch(head, tosearch);
+	$(document).on("click", "#empty", function() {
+		db.clearDB();
+		utils.status.show("Database empty");
+	});
+
+	$(document).on("click", "#remove", function() {
+		email = $('#head_down').html();
+		console.log(email);
+		db.remove(email);
+		utils.status.show("Key removed from local database");
+		refreshDB();
+		document.querySelector("#wrapper_down").className = "content scrollable header";
+		$("[data-position='down']").attr('class', 'down');
+		$("#wrapper_down").empty();
+		$("#head_down").empty();
 	});
 	
-	$(document).on("click", ".file", function() {
-		var reader = new FileReader();
-		reader.onload = function(e) {
-			f.src = e.target.result;
-			wrap = "<div><input type='text' name='name' placeholder='Your name' />" +
-					"<input type='email' name='email' placeholder='Your email' />" +
-					"<button id='add_priv'>Add your private key</button></div>";
-			$("#wrapper_down").append(wrap);
-			$("#head_down").append("Add your priv");
-			document.querySelector('#down').className = 'current';
-			$(document).on("click", "#add_priv", function() {
-				var arr = new Array();
-				data = {
-					'name': $('input[name=name]').val(),
-					'email': $('input[name=email]').val(),
-					'pub': '',
-					'priv': f.src
-				};
-				arr.push(data);
-				db.save(arr);
-				utils.status.show("Private key for <" + $('input[name=email]').val() + "> saved");
-			});
-		}
-		reader.readAsText(f);
-	});
-	
+	/* Export keys - send email */
 	$(document).on("click", "#export_pub", function() {
 		email = $("#head_down").text();
 		name = email + "_pub.txt";
@@ -257,16 +340,15 @@ $(document).ready(function() {
 		saveAs(blob, name);
 	});
 	
-	$(document).on("click", "#remove", function() {
-		email = $('#head_down').html();
-		console.log(email);
-		db.remove(email);
-		utils.status.show("Key removed from local database");
-		refreshDB();
-		document.querySelector("#wrapper_down").className = "content scrollable header";
-		$("[data-position='down']").attr('class', 'down');
-		$("#wrapper_down").empty();
-		$("#head_down").empty();
+	$(document).on("click", "#send-e", function() {
+		body = encodeURIComponent(emsg);
+		var encrMail = new MozActivity({
+			name: "new",
+			data: {
+				type: "mail",
+				url: "mailto:" + bob + "?body=" + body
+			}
+		});
 	});
 	
 	/* Navigation */

@@ -62,3 +62,8 @@ section[role="region"][data-position="right"] {
 	animation: downToDown 0.4s forwards;
 	-webkit-animation: downToDown 0.4s forwards;
 }
+
+section[role="status"] p {
+	line-height: 2rem;
+	margin: 2rem 3rem;
+}
