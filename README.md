@@ -18,4 +18,10 @@ Delete a single key is now working
 Fixed the appears of "RESULTS" string for every file found   
 Updated Gaia Components   
 Less spaghetti code style   
+- **1.6**   
+Added check if an email is already present in the local database   
+Warning if trying to import an existent key   
+Updated Gaia Components   
+Fixed status style   
+Minor fixes   
 
