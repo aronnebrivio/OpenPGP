@@ -25,3 +25,7 @@ Updated Gaia Components
 Fixed status style   
 Minor fixes   
 
+
+##License
+Copyright (C) 2015 Aronne Brivio   
+This program is under GPL license, for more info see COPYING file.   
