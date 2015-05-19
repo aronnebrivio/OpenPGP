@@ -24,7 +24,11 @@ Warning if trying to import an existent key
 Updated Gaia Components   
 Fixed status style   
 Minor fixes   
-
+- **1.6.1**   
+Fixed "Empty Database", now working   
+Added UserAgent check   
+Sending email from PC fixed   
+Added license   
 
 ##License
 Copyright (C) 2015 Aronne Brivio   
