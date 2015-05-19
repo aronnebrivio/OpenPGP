@@ -19,6 +19,8 @@
  */
 
 /* Global vars */
+ua = window.navigator.userAgent;
+ffos = false;
 wrap = "";
 name = "";
 email = "";
@@ -144,6 +146,10 @@ function updatePub(email, pub) {
 };
 
 $(document).ready(function() {
+	console.log(ua);
+	if(ua.match(/Mobile/i))
+		ffos = true;
+	console.log(ffos);
 	db = new DB();
 	
 	/* Generate pair - pick keys */
@@ -363,13 +369,18 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#send-e", function() {
 		body = encodeURIComponent(emsg);
-		var encrMail = new MozActivity({
-			name: "new",
-			data: {
-				type: "mail",
-				url: "mailto:" + bob + "?body=" + body
-			}
-		});
+		if(ffos) {
+			var encrMail = new MozActivity({
+				name: "new",
+				data: {
+					type: "mail",
+					url: "mailto:" + bob + "?body=" + body
+				}
+			});
+		}
+		else {
+			window.open('mailto:' + bob + '?body=' + body);
+		}
 	});
 	
 	/* Navigation */
