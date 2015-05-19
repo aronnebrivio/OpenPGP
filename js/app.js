@@ -328,6 +328,7 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#empty", function() {
 		db.clearDB();
+		refreshDB();
 		utils.status.show("Database empty");
 	});
 

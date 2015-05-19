@@ -125,7 +125,8 @@ function DB() {
 	};
 	
 	this.clearDB = function() {
-		localStorage.removeItem('mydb');
+		db = new Array();
+		localStorage.setItem('mydb', JSON.stringify(db));
 	};
 	
 	return this;
