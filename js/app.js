@@ -498,7 +498,7 @@ $(document).ready(function() {
 	$(document).on("click", "#info", function() {
 		wrap = "<div data-type='list'><p>OpenPGP let's you use PGP method to encrypt/decrypt messages.</p><br>" +
 				"<p>You can find further informations by clicking on Info icons inside every option.</p>" +
-				"<header>Version</header><p>1.6</p></div>";
+				"<header>Version</header><p>1.6.1</p></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append("Info");
 		$("[data-position='down']").attr('class', 'current');
