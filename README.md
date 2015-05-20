@@ -29,6 +29,10 @@ Fixed "Empty Database", now working
 Added UserAgent check   
 Sending email from PC fixed   
 Added license   
+- **1.6.2**      
+Fixed hidden buttons on hover (PC)   
+Fixed import private key from file (PC)   
+Centered title on Info sections    
 
 ##License
 Copyright (C) 2015 Aronne Brivio   
