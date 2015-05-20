@@ -87,3 +87,27 @@ section[role="status"] p {
 	line-height: 2rem;
 	margin: 2rem 3rem;
 }
+
+input[type="file"] {
+	font-family: sans-serif;
+	box-sizing: border-box;
+	display: block;
+	width: 100%;
+	height: 4rem;
+	line-height: 4rem;
+	resize: none;
+	padding: 0 1.5rem;
+	font-size: 1.6rem;
+	border: 0.1rem solid #c7c7c7;
+	border-radius: 0;
+	box-shadow: none; /* override the box-shadow from the system (performance issue) */
+	color: #333;
+	background: #fff;
+	margin: 0 0 1rem 0;
+	unicode-bidi: -moz-plaintext;
+}
+
+.back-button {
+	pointer-events: none;
+	z-index: -1;
+}

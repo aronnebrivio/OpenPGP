@@ -60,7 +60,7 @@
 <body role='application'>
 	<section role='region' id='home' data-position="current">
 		<header class='fixed'>
-			<button disbled></button>
+			<button disbled class='back-button'></button>
 			<menu type='toolbar'>
 				<button id='info' data-icon='info'></button>
 			</menu>
@@ -85,13 +85,21 @@
 			<menu type='toolbar' id='tbar'>	</menu>
 			<h1 id="head"></h1>
 		</header>
-		<article class="content scrollable header" id="wrapper">
+		<article class="content scrollable header">
+			<div>
+				<input type='file' id='file-input'/>
+			</div>
+			<div id="wrapper">
 			<!-- ... -->
+			</div>
 		</article>
 	</section>
 	<section role="region" id="down" data-position="down">
 		<header class="fixed">
 			<button id="close" data-icon="close"></button>
+			<menu type="toolbar">
+				<button disbled class='back-button'></button>
+			</menu>
 			<h1 id="head_down"></h1>
 		</header>
 		<article class="content scrollable header" id="wrapper_down">

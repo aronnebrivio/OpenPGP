@@ -34,6 +34,7 @@ finder = null;
 needle = "";
 elems = "";
 keyType = "";
+keyfile = "";
 
 /* Find a key from server od from file */
 function onlineSearch() {
@@ -106,10 +107,10 @@ function refreshDB() {
 			items = items + item;
 		}
 		wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
-				"<div><button id='empty' class='danger'>Clear database</button><div>";
+				"<br><button id='empty' class='danger'>Clear database</button>";
 	}
 	else
-		wrap = "<div><p>Database empty</p></div>";
+		wrap = "<p>Database empty</p>";
 	$("#wrapper").append(wrap);
 	$("#head").append("Database");
 	$("#tbar").append("<button data-icon='info' id='info_database'></button");
@@ -196,7 +197,8 @@ $(document).ready(function() {
 		head = "<header>Local Results</header>";
 		email = $('input[name=bob]').val();
 		onlineSearch();
-		localSearch(head, email, "pub");
+		if(ffos)
+			localSearch(head, email, "pub");
 		$(document).on("click", "#a", function() {
 			if(!db.contains(email)) {
 				var arr = new Array();
@@ -281,6 +283,57 @@ $(document).ready(function() {
 		reader.readAsText(f);
 	});
 	
+	/* PC purpose only */
+	if(!ffos) {
+		var fileInput = document.getElementById('file-input');
+		if(fileInput) {
+			fileInput.addEventListener('change', function(e) {
+				var file = fileInput.files[0];
+				console.log(file);
+				var textType = /text.*/;
+			if (file.type.match(textType)) {
+				var reader = new FileReader();
+
+				reader.onload = function(e) {
+					console.log(reader.result);
+					keyfile = reader.result;
+				}
+
+				reader.readAsText(file);  
+				} else {
+					alert("File not supported!");
+				}
+			});
+		}
+	
+		$(document).on("click", "#pick_priv_pc", function() {
+			keyType = "priv";
+			wrap = "<div><input type='text' name='name' placeholder='Your name' />" +
+					"<input type='email' name='email' placeholder='Your email' />" +
+					"<button id='add_priv'>Add your private key</button></div>";
+			$("#wrapper_down").append(wrap);
+			$("#head_down").append("Add your private key");
+			document.querySelector('#down').className = 'current';
+			$(document).on("click", "#add_priv", function() {
+				email = $('input[name=email]').val();
+				if(!db.contains(email)) {
+					var arr = new Array();
+					data = {
+						'name': $('input[name=name]').val(),
+						'email': email,
+						'pub': '',
+						'priv': keyfile
+					};
+					arr.push(data);
+					db.save(arr);
+					utils.status.show("Private key for <" + email + "> saved. Consider to remove the file from your PC.");
+				}
+				else
+					updatePriv(email, keyfile);
+			});
+		});
+	}
+			
 	/* Encrypt - Decrypt functions */
 	$(document).on("click", "#btn-encrypt", function() {
 		bob = $('input[name=bob]').val();
@@ -379,17 +432,18 @@ $(document).ready(function() {
 			});
 		}
 		else {
-			window.open('mailto:' + bob + '?body=' + body);
+			window.location.href = 'mailto:' + bob + '?body=' + body;
 		}
 	});
 	
 	/* Navigation */
 	$(document).on("click", "#generate-pair", function() {
-		wrap = "<div><input type='text' name='name' placeholder='Your Name' />" +
+		$("#file-input").attr("style", "display: none;");
+		wrap = "<input type='text' name='name' placeholder='Your Name' />" +
 				"<input type='email' name='email' placeholder='Your Email' />" +
 				"<input type='password' name='pwd' placeholder='Passphrase' />" +
 				"<input type='password' name='pwd2' placeholder='Re-enter passphrase' />" +
-				"<button id='btn-generate'>Generate Pair</button></div>";
+				"<button id='btn-generate'>Generate Pair</button>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
@@ -398,9 +452,10 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#load-pub-key", function() {
-		wrap = "<div><input type='text' name='bob' placeholder='Type an email' />" +
-				"<button id='search_pub'>Search</button></div><div data-type='list' id='online_res'>" +
-				"</div><div data-type='list' id='local_res'></div>";
+		$("#file-input").attr("style", "display: none;");
+		wrap = "<input type='text' name='bob' placeholder='Type an email' />" +
+				"<button id='search_pub'>Search</button><div data-type='list' id='online_res'></div>" +
+				"<div data-type='list' id='local_res'></div>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
@@ -409,8 +464,15 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#load-priv-key", function() {
-		wrap = "<div><input type='text' name='file' placeholder='Type file to search' />" +
-				"<button id='pick_priv'>Search</button></div><div data-type='list' id='local_res'></div>";
+		if(ffos) {
+			$("#file-input").attr("style", "display: none;");
+			wrap = "<input type='text' name='file' placeholder='Type file to search' />" +
+					"<button id='pick_priv'>Search</button><div data-type='list' id='local_res'></div>";
+		}
+		else {
+			$("#file-input").attr("style", "");
+			wrap = "<button id='pick_priv_pc'>Select this file</button>";
+		}
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
@@ -419,10 +481,11 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#encrypt", function() {
-		wrap = "<div><input type='text' name='bob' placeholder='Email of the receiver' />" +
+		$("#file-input").attr("style", "display: none;");
+		wrap = "<input type='text' name='bob' placeholder='Email of the receiver' />" +
 				"<textarea type='text' name='msg' placeholder='Write your message to encrypt here' />" +
 				"<button id='btn-encrypt'>Encrypt Message</button>" +
-				"<textarea type='text' name='emsg' placeholder='Encrypted text will be here' /></div>";
+				"<textarea type='text' name='emsg' placeholder='Encrypted text will be here' />";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
@@ -431,11 +494,12 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#decrypt", function() {
-		wrap = "<div><input type='text' name='alice' placeholder='Your Email' />" +
+		$("#file-input").attr("style", "display: none;");
+		wrap = "<input type='text' name='alice' placeholder='Your Email' />" +
 				"<textarea type='text' name='emsg' placeholder='Paste encrypted text here' />" +
 				"<input type='password' name='pwd' placeholder='Passphrase' />" +
 				"<button id='btn-decrypt'>Decrypt Message</button>" +
-				"<textarea type='text' name='msg' placeholder='Decrypted text will be here' /></div>";
+				"<textarea type='text' name='msg' placeholder='Decrypted text will be here' />";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
@@ -444,6 +508,7 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#database", function() {
+		$("#file-input").attr("style", "display: none;");
 		document.querySelector("#wrapper_down").className = "content scrollable header database";
 		refreshDB();
 		document.querySelector('#right').className = 'current';
@@ -478,6 +543,7 @@ $(document).ready(function() {
 	});
 	
 	$(document).on("click", "#back", function() {
+		$("#file-input").attr("style", "display: none;");
 		$("[data-position='current']").attr('class', 'current');
 		$("[data-position='right']").attr('class', 'right');
 		$("#wrapper").empty();
