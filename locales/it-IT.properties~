@@ -1,0 +1,6 @@
+gen-pair = Crea una coppia di chiavi
+load-pub = Importa una chiave pubblica
+load-priv = Importa una chiave privata
+encrypt = Cifra un messaggio
+decrypt = Decifra un messaggio
+db = Database locale

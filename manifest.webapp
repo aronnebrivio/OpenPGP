@@ -5,7 +5,17 @@
 		"name": "aroblu94",
 		"url": "http://aro94.altervista.org"
 	},
-	"default_locale": "it",
+	"default_locale": "en-US",
+	"locales": {
+		"es": {
+			"name": "OpenPGP",
+			"description": "..."
+		},
+		"it-IT": {
+			"name": "OpenPGP",
+			"description": "Manda messaggi cifrati con PGP!"
+		}
+	},
 	"version": "1.6.2",
 	"icons": {
 		"16": "/icons/16x16.png",

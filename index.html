@@ -56,6 +56,12 @@
 	<script src="js/storage.js"></script>
 	<script src="js/app.js"></script>
 	
+	<!-- Localization -->
+	<script defer src="js/l10n.js" charset="utf-8"></script>
+	<link rel="prefetch" type="application/l10n" href="locales/locales.ini" />
+	<link rel="manifest" href="./manifest.webapp" />
+	<link rel="localization" href="locales/it-IT.properties" />
+	
 </head>
 <body role='application'>
 	<section role='region' id='home' data-position="current">
@@ -69,12 +75,12 @@
 		<article class="content scrollable header">
 			<section data-type="list">
 				<ul>
-					<li><a href="#" id="generate-pair"><p>Generate a pair</p></a></li>
-					<li><a href="#" id="load-pub-key"><p>Load a Public key</p></a></li>
-					<li><a href="#" id="load-priv-key"><p>Load a Private key</p></a></li>
-					<li><a href="#" id="encrypt"><p>Encrypt a message</p></a></li>
-					<li><a href="#" id="decrypt"><p>Decrypt a message</p></a></li>
-					<li><a href="#" id="database"><p>Local database</p></a></li>
+					<li><a href="#" id="generate-pair"><p data-l10n-id="gen-pair">Generate a pair</p></a></li>
+					<li><a href="#" id="load-pub-key"><p data-l10n-id="load-pub">Load a Public key</p></a></li>
+					<li><a href="#" id="load-priv-key"><p data-l10n-id="load-priv">Load a Private key</p></a></li>
+					<li><a href="#" id="encrypt"><p data-l10n-id="encrypt">Encrypt a message</p></a></li>
+					<li><a href="#" id="decrypt"><p data-l10n-id="decrypt">Decrypt a message</p></a></li>
+					<li><a href="#" id="database"><p data-l10n-id="db">Local database</p></a></li>
 				</ul>
 			</section>
 		</article>
