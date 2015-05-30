@@ -51,9 +51,9 @@ function onlineSearch() {
 		if(xhr.status == 200) {
 	    	page = $(xhr.response);
 	    	pub_to_import = $(xhr.response)[9].innerHTML;
-	    	wrap = "<header>Online Results</header>" +
+	    	wrap = "<header data-l10n-id='head-online-res'>Online Results</header>" +
 	    			"<ul><li><a href='#' id='a'><p>" + email + "</p>" +
-	    			"<p>Tap here to save his public key</p></a></li></ul>";
+	    			"<p data-l10n-id='tap-save-pub'></p></a></li></ul>";
 	    	$("#online_res").append(wrap);
 		}
 		else if(xhr.status == 404) {
@@ -73,7 +73,7 @@ function localSearch(head, needle, kt) {
 	finder.search(fsearch);
 	finder.on("fileFound", function(file, fileinfo, storageName) {
 		elem = "<ul><li><a href='#' id='" + file.name + "' class ='file " + keyType + "'>" +
-				"<p>" + fileinfo.name + "</p><p>At " + fileinfo.path + "</p></a></li></ul>";
+				"<p>" + fileinfo.name + "</p><p>In " + fileinfo.path + "</p></a></li></ul>";
 		f = file;
 		elems = elems + elem;
 	});
@@ -108,10 +108,10 @@ function refreshDB() {
 			items = items + item;
 		}
 		wrap = "<section data-type='list'><ul>" + items + "</ul></section>" +
-				"<br><button id='empty' class='danger'>Clear database</button>";
+				"<br><button id='empty' class='danger' data-l10n-id='clear-db'></button>";
 	}
 	else
-		wrap = "<p>Database empty</p>";
+		wrap = "<p data-l10n-id='db-empty'></p>";
 	$("#wrapper").append(wrap);
 	$("#head").append("Database");
 	$("#tbar").append("<button data-icon='info' id='info_database'></button");
@@ -195,7 +195,7 @@ $(document).ready(function() {
 	$(document).on("click", "#search_pub", function() {
 		$('#local_res').empty();
 		$('#online_res').empty();
-		head = "<header>Local Results</header>";
+		head = "<header data-l10n-id='head-local-res'></header>";
 		email = $('input[name=bob]').val();
 		onlineSearch();
 		if(ffos)
@@ -220,7 +220,7 @@ $(document).ready(function() {
 	
 	$(document).on("click", "#pick_priv", function() {
 		$('#local_res').empty();
-		head = "<header>Results</header>";
+		head = "<header data-l10n-id='res-priv'></header>";
 		tosearch = $('input[name=file]').val();
 		localSearch(head, tosearch, "priv");
 	});
@@ -233,7 +233,7 @@ $(document).ready(function() {
 			if(keyType == "priv") {
 				wrap = "<div><input type='text' name='name' placeholder='Your name' />" +
 						"<input type='email' name='email' placeholder='Your email' />" +
-						"<button id='add_priv'>Add your private key</button></div>";
+						"<button id='add_priv' data-l10n-id='add-priv'></button></div>";
 				$("#wrapper_down").append(wrap);
 				$("#head_down").append("Add your private key");
 				document.querySelector('#down').className = 'current';
@@ -258,7 +258,7 @@ $(document).ready(function() {
 			else {
 				wrap = "<div><input type='text' name='name' placeholder='Name' />" +
 						"<input type='email' name='email' placeholder='Email' />" +
-						"<button id='add_priv'>Add public key</button></div>";
+						"<button id='add_priv' data-l10n-id='add-pub'></button></div>";
 				$("#wrapper_down").append(wrap);
 				$("#head_down").append("Add public key");
 				document.querySelector('#down').className = 'current';
@@ -311,7 +311,7 @@ $(document).ready(function() {
 			keyType = "priv";
 			wrap = "<div><input type='text' name='name' placeholder='Your name' />" +
 					"<input type='email' name='email' placeholder='Your email' />" +
-					"<button id='add_priv'>Add your private key</button></div>";
+					"<button id='add_priv' data-l10n-id='add-priv'></button></div>";
 			$("#wrapper_down").append(wrap);
 			$("#head_down").append("Add your private key");
 			document.querySelector('#down').className = 'current';
@@ -444,7 +444,7 @@ $(document).ready(function() {
 				"<input type='email' name='email' placeholder='Your Email' />" +
 				"<input type='password' name='pwd' placeholder='Passphrase' />" +
 				"<input type='password' name='pwd2' placeholder='Re-enter passphrase' />" +
-				"<button id='btn-generate'>Generate Pair</button>";
+				"<button id='btn-generate' data-l10n-id='gen-pair'></button>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
 		$("#wrapper").append(wrap);
@@ -455,7 +455,7 @@ $(document).ready(function() {
 	$(document).on("click", "#load-pub-key", function() {
 		$("#file-input").attr("style", "display: none;");
 		wrap = "<input type='text' name='bob' placeholder='Type an email' />" +
-				"<button id='search_pub'>Search</button><div data-type='list' id='online_res'></div>" +
+				"<button id='search_pub' data-l10n-id='search'></button><div data-type='list' id='online_res'></div>" +
 				"<div data-type='list' id='local_res'></div>";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
@@ -468,11 +468,11 @@ $(document).ready(function() {
 		if(ffos) {
 			$("#file-input").attr("style", "display: none;");
 			wrap = "<input type='text' name='file' placeholder='Type file to search' />" +
-					"<button id='pick_priv'>Search</button><div data-type='list' id='local_res'></div>";
+					"<button id='pick_priv' data-l10n-id='search'></button><div data-type='list' id='local_res'></div>";
 		}
 		else {
 			$("#file-input").attr("style", "");
-			wrap = "<button id='pick_priv_pc'>Select this file</button>";
+			wrap = "<button id='pick_priv_pc' data-l10n-id='sel-file'></button>";
 		}
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
@@ -485,7 +485,7 @@ $(document).ready(function() {
 		$("#file-input").attr("style", "display: none;");
 		wrap = "<input type='text' name='bob' placeholder='Email of the receiver' />" +
 				"<textarea type='text' name='msg' placeholder='Write your message to encrypt here' />" +
-				"<button id='btn-encrypt'>Encrypt Message</button>" +
+				"<button id='btn-encrypt' data-l10n-id='btn-encr'></button>" +
 				"<textarea type='text' name='emsg' placeholder='Encrypted text will be here' />";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
@@ -499,7 +499,7 @@ $(document).ready(function() {
 		wrap = "<input type='text' name='alice' placeholder='Your Email' />" +
 				"<textarea type='text' name='emsg' placeholder='Paste encrypted text here' />" +
 				"<input type='password' name='pwd' placeholder='Passphrase' />" +
-				"<button id='btn-decrypt'>Decrypt Message</button>" +
+				"<button id='btn-decrypt' data-l10n-id='btn-decr'></button>" +
 				"<textarea type='text' name='msg' placeholder='Decrypted text will be here' />";
 		document.querySelector('#right').className = 'current';
 		document.querySelector('[data-position="current"]').className = 'left';
@@ -523,7 +523,7 @@ $(document).ready(function() {
 				"<button id='update'>Update</button>" +
 				"<button id='export_priv'>Export private key</button>" +
 				"<button id='export_pub'>Export public key</button>" +
-				"<button id='remove' class='danger'>Remove key</button></div>";
+				"<button id='remove' class='danger' data-l10n-id='rem-key'></button></div>";
 		$("#wrapper_down").append(wrap);
 		$("#head_down").append(this.id);
 		if(db.getPub(this.id) == "")
