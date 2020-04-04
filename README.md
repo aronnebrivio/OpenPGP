@@ -1,4 +1,4 @@
-#OpenPGP
+# OpenPGP
 WebApp to port GPG messages encryption to FirefoxOS.   
 It's possible to:
 - Generate a key pair
@@ -8,7 +8,7 @@ It's possible to:
 - Decrypt a message
 - Manage keys saved locally   
 
-##History
+## History
 - **1.0**   
 First version  
 - **1.5**   
@@ -34,6 +34,6 @@ Fixed hidden buttons on hover (PC)
 Fixed import private key from file (PC)   
 Centered title on Info sections    
 
-##License
+## License
 Copyright (C) 2015 Aronne Brivio   
-This program is under GPL license, for more info see COPYING file.   
+This program is under GPL license, for more info see [COPYING](https://github.com/aronnebrivio/OpenPGP/blob/master/COPYING) file.   
