@@ -1,4 +1,6 @@
 # OpenPGP
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Faronnebrivio%2FOpenPGP.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Faronnebrivio%2FOpenPGP?ref=badge_shield)
+
 WebApp to port GPG messages encryption to FirefoxOS.   
 It's possible to:
 - Generate a key pair
@@ -37,3 +39,6 @@ Centered title on Info sections
 ## License
 Copyright (C) 2015 Aronne Brivio   
 This program is under GPL license, for more info see [COPYING](https://github.com/aronnebrivio/OpenPGP/blob/master/COPYING) file.   
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Faronnebrivio%2FOpenPGP.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Faronnebrivio%2FOpenPGP?ref=badge_large)
